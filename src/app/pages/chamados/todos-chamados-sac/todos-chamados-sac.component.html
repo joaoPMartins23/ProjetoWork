@@ -1,0 +1,174 @@
+<section>
+  <div class="cabecalho">
+    <h1>Todos os Chamados SAC</h1>
+  </div>
+
+  <div *ngIf="carregando" class="area-carregando">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="conteudo" *ngIf="!carregando">
+    <div class="filtros-container pretty">
+      <div class="filters-top">
+        <div class="filters-search">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Pesquisar por qualquer campo…" [ngModel]="termoPesquisa"
+            (ngModelChange)="onPesquisarTermo($event)" />
+
+          <button type="button" class="btn" (click)="limparTodosFiltros()" title="Limpar todos os filtros">
+            <img src="/assets/images/icons/semFiltro.png" alt="">
+          </button>
+        </div>
+      </div>
+
+      <div class="filters-grid">
+        <div class="field" *ngIf="perfilAcessoUsuario != 'Usuário'">
+          <label>Responsável</label>
+          <ng-select [(ngModel)]="responsavelSelecionadoId" (change)="aplicarFiltro()" [clearable]="false">
+            <ng-option value="todos">Todos</ng-option>
+            <ng-option *ngFor="let u of usuariosDepartamento" [value]="u.UsuarioID">
+              {{ u.Nome }}
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="field">
+          <label>Serviço</label>
+          <ng-select [(ngModel)]="servicoSelecionadoId" (change)="aplicarFiltro()" [clearable]="false">
+            <ng-option value="todos">Todos</ng-option>
+            <ng-option *ngFor="let s of servicos" [value]="s.ServicoID">
+              {{ s.Servico }}
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="field">
+          <label>Cliente</label>
+          <ng-select [(ngModel)]="clienteSelecionadoId" (change)="aplicarFiltro()" [clearable]="false">
+            <ng-option value="todos">Todos</ng-option>
+            <ng-option *ngFor="let c of clientes" [value]="c.ClienteID">
+              {{ c.NomeCliente }}
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <ng-select [(ngModel)]="filtroSelecionado" (change)="aplicarFiltro()" [clearable]="false">
+            <ng-option value="todos">Todos</ng-option>
+            <ng-option value="em-espera">Em espera</ng-option>
+            <ng-option value="aguardando-solicitante">Aguardando solicitante</ng-option>
+            <ng-option value="aguardando-responsavel">Aguardando responsável</ng-option>
+            <ng-option value="aguardando-parceiro">Aguardando parceiro</ng-option>
+            <ng-option value="nao-resolvidos">Abertos</ng-option>
+            <ng-option value="resolvidos">Finalizados</ng-option>
+            <ng-option value="nao-atribuido">Não atribuídos</ng-option>
+          </ng-select>
+        </div>
+
+        <div class="field date-range">
+          <label>Período</label>
+          <div class="date-inline">
+            <div class="date-input">
+              <i class="fa fa-calendar"></i>
+              <input type="date" [(ngModel)]="dataInicio" (change)="aplicarFiltro()" />
+            </div>
+            <span class="sep">—</span>
+            <div class="date-input">
+              <i class="fa fa-calendar"></i>
+              <input type="date" [(ngModel)]="dataFim" (change)="aplicarFiltro()" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabela-wrapper">
+      <table class="tabela-generica" *ngIf="chamadosEnviar.length > 0">
+        <thead>
+          <tr>
+            <th *ngFor="let cabecalho of cabecalhosEnviar" (click)="ordenarPor(cabecalho.CampoChave)"
+              class="th-sortable" [class.ativo]="criterioOrdenacao.campo === cabecalho.CampoChave">
+              {{ cabecalho.CampoTitulo }}
+              <i class="fa" [ngClass]="{
+      'fa-sort': criterioOrdenacao.campo !== cabecalho.CampoChave,
+      'fa-sort-up': criterioOrdenacao.campo === cabecalho.CampoChave && criterioOrdenacao.direcao === 'asc',
+      'fa-sort-down': criterioOrdenacao.campo === cabecalho.CampoChave && criterioOrdenacao.direcao === 'desc'}"></i>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody (mouseleave)="onRowLeave()">
+          <tr
+            *ngFor="let linha of chamadosEnviar | paginate: { itemsPerPage: itensPorPagina, currentPage: paginaAtual }"
+            [ngClass]="rowClassMap[linha.Status] || 'row--status-default'" routerLink="/Chamados/Detalhes/Sac/{{linha.ID}}"
+            (mouseenter)="onRowEnter($event, linha)">
+            <td *ngFor="let cabecalho of cabecalhosEnviar; let i = index"
+              [attr.data-label]="cabecalhosEditadosEnviar[i].CampoTitulo">
+
+              <ng-container [ngSwitch]="cabecalhosEditadosEnviar[i].CampoTitulo">
+
+                <ng-container *ngSwitchCase="'Ativo'">
+                  <i class="fa" [ngClass]="{
+           'fa-check': linha['Ativo'] === 'Sim',
+           'fa-times': linha['Ativo'] === 'Não'
+         }">
+                  </i>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Prioridade'">
+                  <i class="fa fa-flag" [ngClass]="{
+           'urgencia-baixa': linha.Prioridade === 'Baixa',
+           'urgencia-media': linha.Prioridade === 'Média',
+           'urgencia-alta': linha.Prioridade === 'Alta'
+         }" [title]="'Prioridade: ' + linha.Prioridade">
+                  </i>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Status'">
+                  <span class="badge-status" [ngClass]="statusClassMap[linha.Status] || 'badge-status--default'">
+                    <i class="fa" [ngClass]="statusIconMap[linha.Status] || 'fa-circle'"></i>
+                    {{ linha.Status }}
+                  </span>
+                </ng-container>
+
+                <ng-container *ngSwitchDefault>
+                  {{ linha[cabecalhosEditadosEnviar[i].CampoTitulo] }}
+                </ng-container>
+
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hover-preview" *ngIf="preview.visible" [style.top.px]="preview.y" [style.left.px]="preview.x">
+        <div class="hp-head">
+          <strong>Protocolo:</strong> {{ preview.data?.Protocolo }}
+        </div>
+        <div class="hp-title">{{ preview.data?.Assunto }}</div>
+
+        <div class="hp-row"><strong>Cliente:</strong> <span>{{ preview.data?.Solicitante }}</span></div>
+        <div class="hp-row"><strong>Abertura:</strong> <span>{{ preview.data?.DataAbertura }}</span></div>
+
+        <div class="hp-row hp-desc-row">
+          <strong>Descrição:</strong>
+          <span class="hp-desc">
+            <ng-container *ngIf="!preview.carregando; else carregandoTpl">
+              {{ preview.data?.Descricao || '—' }}
+            </ng-container>
+            <ng-template #carregandoTpl>Carregando…</ng-template>
+          </span>
+        </div>
+      </div>
+
+      <pagination-controls (pageChange)="onPaginaChange($event)" previousLabel="" nextLabel="" class="paginacao"
+        *ngIf="chamadosEnviar.length > 0">
+      </pagination-controls>
+
+      <div class="mensagem-vazia" *ngIf="chamadosEnviar.length === 0">
+        <p>Nenhum chamado encontrado.</p>
+      </div>
+    </div>
+  </div>
+</section>

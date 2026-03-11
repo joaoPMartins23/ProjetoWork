@@ -1,0 +1,304 @@
+:host {
+  --bg: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+
+  --card: #ffffff;
+  --soft: #f8fafc;
+
+  --radius: 18px;
+  --radius-sm: 14px;
+
+  --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+  --shadow-sm: 0 10px 22px rgba(2, 6, 23, 0.06);
+
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+.print-page {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  width: min(980px, 100%);
+  margin: 24px auto;
+  padding: 24px;
+  //border: 1px solid var(--line);
+  //border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.loading {
+  font-family: var(--font);
+  color: var(--muted);
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  min-height: 30vh;
+}
+
+/* Header moderno */
+.report-header {
+  padding: 6px 0 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+.report-header h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 12.5px;
+}
+
+.chip--muted {
+  color: var(--muted);
+}
+
+/* Seções */
+.section {
+  margin: 16px 0 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+  margin-bottom: 12px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-title p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Campo moderno */
+.field {
+  padding: 12px 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.field.wide {
+  grid-column: 1 / -1; /* ocupa a linha toda */
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* Mensagens */
+.msg {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  margin: 12px 0;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.msg-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 10px;
+}
+
+.msg-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.msg-who strong {
+  font-size: 13.5px;
+}
+
+.muted {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.badge {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  color: #3730a3;
+  white-space: nowrap;
+}
+
+.msg-body {
+  font-size: 13.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Responsivo */
+@media (max-width: 720px) {
+  .print-page {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border-left: 0;
+    border-right: 0;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  .print-page {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .section,
+  .msg {
+    box-shadow: none;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+.page-spacer {
+  width: 100%;
+}
+
+@media print {
+  .no-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+@page {
+  margin: 12mm;
+}
+
+.msg-media {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.msg-img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Permite quebrar a mensagem ao longo das páginas */
+.msg {
+  break-inside: auto;
+  page-break-inside: auto;
+}
+
+/* Não deixa quebrar o cabeçalho da mensagem */
+.msg-head {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Não deixa quebrar uma imagem no meio (cada imagem individual) */
+.msg-img {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Pode quebrar o grid de imagens ao longo das páginas */
+.msg-media {
+  break-inside: auto;
+  page-break-inside: auto;
+}
+
+body.pdf-render .msg-media {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+body.pdf-render .msg-img {
+  height: 140px;
+}
+
+.no-break{
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.allow-break{
+  break-inside: auto !important;
+  page-break-inside: auto !important;
+}

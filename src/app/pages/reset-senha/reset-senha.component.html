@@ -1,0 +1,60 @@
+<section class="tela-recuperacao">
+  <main class="area-formulario">
+    <article class="caixa-formulario">
+      <figure class="logo">
+        <img src="/assets/images/logos/projetowork.png" alt="projetowork" />
+      </figure>
+
+      <header class="cabecalho">
+        <h1>Redefinir senha</h1>
+        <p>{{ senhaAlterada? '': 'Informe uma nova senha para sua conta.' }}</p>
+      </header>
+
+      <ng-container *ngIf="!senhaAlterada; else sucessoSenha">
+        <form [formGroup]="formularioRecuperacao" (ngSubmit)="onSubmit()">
+
+          <div class="grupo-campo senha-com-icone">
+            <label [ngClass]="{ 'erro-label': temErro('NovaSenha') }">
+              {{ temErro('NovaSenha') ? obterMensagemErro('NovaSenha') : 'Nova senha' }}
+            </label>
+            <div class="input-container">
+              <input [type]="mostrarNovaSenha ? 'text' : 'password'" formControlName="NovaSenha"
+                [ngClass]="{ 'campo-invalido': temErro('NovaSenha') }" placeholder="********" />
+              <button type="button" class="botao-olho" (click)="alternarVisibilidade('nova')" tabindex="-1">
+                <i class="fa fa-{{ mostrarNovaSenha ? 'eye' : 'eye-slash' }}"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="grupo-campo senha-com-icone">
+            <label [ngClass]="{ 'erro-label': temErro('ConfirmarSenha') }">
+              {{ temErro('ConfirmarSenha') ? obterMensagemErro('ConfirmarSenha') : 'Confirmar senha' }}
+            </label>
+            <div class="input-container">
+              <input [type]="mostrarConfirmarSenha ? 'text' : 'password'" formControlName="ConfirmarSenha"
+                [ngClass]="{ 'campo-invalido': temErro('ConfirmarSenha') }" placeholder="********" />
+              <button type="button" class="botao-olho" (click)="alternarVisibilidade('confirmar')" tabindex="-1">
+                <i class="fa fa-{{ mostrarConfirmarSenha ? 'eye' : 'eye-slash' }}"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit">Salvar nova senha</button>
+        </form>
+      </ng-container>
+
+      <ng-template #sucessoSenha>
+        <div class="mensagem-sucesso">
+          <i class="fa fa-check-circle" style="color: #28a745; font-size: 1.4rem; margin-bottom: 1rem;"></i>
+          <h3>Senha redefinida com sucesso!</h3>
+          <p>Você já pode acessar o sistema com sua nova senha.</p>
+          <button (click)="router.navigate(['/Login'])">Voltar para o login</button>
+        </div>
+      </ng-template>
+    </article>
+  </main>
+</section>
+
+<div class="avisoToken" *ngIf="erroTokenAberto">
+  <p>Email Expirado! Solicite um novo email de recuperação.</p>
+</div>

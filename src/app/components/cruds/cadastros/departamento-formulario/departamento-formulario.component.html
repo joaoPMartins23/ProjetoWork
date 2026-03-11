@@ -1,0 +1,82 @@
+<section>
+  <form [formGroup]="formularioDepartamento" (ngSubmit)="onSubmit()" class="formulario-departamento" #formDir="ngForm"
+    *ngIf="!confirmacaoAtiva">
+    <div>
+      <div class="cabecalhoFormulario">
+        <h2>
+          <i class="fa fa-arrow-left" routerLink="/Departamentos"></i>
+          {{ urlAtual.length == 2? 'Criar': 'Editar' }} Departamento
+        </h2>
+
+        <i class="fa fa-times" routerLink="/Departamentos"></i>
+      </div>
+
+      <div *ngIf="carregando" class="area-carregando">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="form-linha linha-unica" *ngIf="!carregando">
+        <label
+          [style.color]="formularioDepartamento.get('Departamento')?.invalid && formDir.submitted? 'red': '#000'">Departamento</label>
+        <input type="text" formControlName="Departamento"
+          placeholder="{{formularioDepartamento.get('Departamento')?.invalid && formDir.submitted? 'Obrigatório': ''}}" />
+      </div>
+
+      <div class="checkbox-wrapper" *ngIf="!carregando">
+        <label>
+          <input type="checkbox" formControlName="Ativo" />
+          Ativo
+        </label>
+      </div>
+    </div>
+
+    <div class="botoesFormulario" *ngIf="!carregando">
+      <button type="button" class="btn-excluir" *ngIf="urlAtual.length == 3" (click)="alternarConfirmacao()">
+        <i class="fa fa-trash"></i>
+        Excluir
+      </button>
+
+      <button type="submit" class="btn-salvar">
+        <i class="fa fa-save"></i>
+        Salvar
+      </button>
+    </div>
+  </form>
+
+  <div class="confirmacaoExclusao" *ngIf="confirmacaoAtiva" (click)="alternarConfirmacao()">
+    <div class="modal-exclusao" (click)="$event.stopPropagation()">
+      <div class="cabecalhoExclusao">
+        <div class="titulo">
+          <div class="icone-alerta">
+            <i class="fa fa-exclamation-triangle"></i>
+          </div>
+          <div>
+            <h2>Excluir departamento</h2>
+            <p>Essa ação não pode ser desfeita.</p>
+          </div>
+        </div>
+
+        <button type="button" class="btn-fechar" (click)="alternarConfirmacao()">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+
+      <div class="corpoExclusao">
+        <p>
+          Tem certeza de que deseja excluir este departamento?
+        </p>
+      </div>
+
+      <div class="botoes-confirmacao">
+        <button type="button" class="btn-cancelar" (click)="alternarConfirmacao()">
+          Cancelar
+        </button>
+
+        <button type="button" class="btn-confirmar-exclusao" (click)="confirmarExclusao()">
+          <i class="fa fa-trash"></i>
+          Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

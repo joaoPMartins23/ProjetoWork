@@ -1,0 +1,58 @@
+<div class="cabecalho-tabela">
+  <div class="lado-esquerdo">
+    <div class="input-pesquisa">
+      <input type="text" placeholder="Pesquisar..." [(ngModel)]="termoPesquisa" (input)="pesquisar()" inputmode="search"
+        autocomplete="off" />
+      <i class="fa fa-search"></i>
+    </div>
+  </div>
+
+  <div class="lado-direito">
+    <button class="btn-novo" (click)="navegarNovoObjeto()" aria-label="Criar novo">
+      <i class="fa fa-plus"></i> Novo
+    </button>
+  </div>
+</div>
+
+<div class="tabela-wrapper" *ngIf="dadosFiltrados.length > 0">
+  <table class="tabela-generica">
+    <thead>
+      <tr>
+        <th *ngFor="let cabecalho of cabecalhos; let i = index" (click)="ordenarPor(i)" class="th-sortable"
+          [class.ativo]="sortIndex === i">
+          <span>{{ cabecalho.CampoTitulo }}</span>
+
+          <span class="setas" *ngIf="sortIndex === i">
+            <i class="fa" [ngClass]="{ 'fa-sort-up': sortAsc, 'fa-sort-down': !sortAsc }"></i>
+          </span>
+          <span class="setas" *ngIf="sortIndex !== i">
+            <i class="fa fa-sort"></i>
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let linha of dadosFiltrados | paginate: { itemsPerPage: itensPorPagina, currentPage: paginaAtual }"
+        (click)="navegarEditarObjeto(linha.ID)">
+        <td *ngFor="let cabecalho of cabecalhos; let i = index" [attr.data-label]="cabecalhos[i].CampoTitulo">
+          <ng-container *ngIf="cabecalhosEditados[i].CampoTitulo === 'Ativo'; else default">
+            <i class="fa" [ngClass]="{
+          'fa-check': linha['Ativo'] === 'Sim',
+          'fa-times': linha['Ativo'] === 'Não'
+        }"></i>
+          </ng-container>
+          <ng-template #default>{{ linha[cabecalhosEditados[i].CampoTitulo] }}</ng-template>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <pagination-controls (pageChange)="paginaAtual = $event" previousLabel="" nextLabel="" class="paginacao">
+  </pagination-controls>
+</div>
+
+<div class="nenhumDado" *ngIf="dadosFiltrados.length == 0">
+  <p>Nehum dado encontrado em Usuários!</p>
+</div>

@@ -1,0 +1,292 @@
+<section class="dashboard-fancy">
+  <header class="dashboard-header">
+    <div class="header-info">
+      <h1>Dashboard</h1>
+    </div>
+  </header>
+
+  <div *ngIf="carregando" class="area-carregando">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="card card-ribbon card-ribbon--blue filters-card" *ngIf="!carregando">
+    <div class="card-header">
+      <h3>Filtros</h3>
+    </div>
+
+    <div class="filters-grid">
+      <div class="f-campo">
+        <label>Status</label>
+        <ng-select [clearable]="false" [(ngModel)]="filtro.status" (change)="onFiltroChanged()" [appendTo]="'body'"
+          [dropdownPosition]="'bottom'">
+          <ng-option [value]="'Todos'">Todos</ng-option>
+          <ng-option *ngFor="let s of opcoesStatus" [value]="s">{{ s }}</ng-option>
+        </ng-select>
+      </div>
+
+      <div class="f-campo">
+        <label>De</label>
+        <input type="date" [(ngModel)]="filtro.dataIni" (change)="onFiltroChanged()">
+      </div>
+
+      <div class="f-campo">
+        <label>Até</label>
+        <input type="date" [(ngModel)]="filtro.dataFim" (change)="onFiltroChanged()">
+      </div>
+
+      <div class="f-actions">
+        <button class="btn ghost" type="button" (click)="limparFiltros()">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-section" *ngIf="!carregando">
+    <div class="kpi-grid">
+      <a class="kpi kpi--green" routerLink="/Chamados/AbertosPorMim">
+        <div class="kpi-icon"><i class="fa fa-ticket"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-title">Abertos por mim</div>
+          <div class="kpi-value">{{ kpis.meusAbertos }}</div>
+        </div>
+      </a>
+
+      <a class="kpi kpi--blue" routerLink="/Chamados/AbertosEquipe">
+        <div class="kpi-icon"><i class="fa fa-building"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-title" *ngIf="!ehDiretoria">Abertos pela minha equipe</div>
+          <div class="kpi-title" *ngIf="ehDiretoria">Abertos pelos colaboradores</div>
+          <div class="kpi-value">{{ kpis.deptoAbertos }}</div>
+        </div>
+      </a>
+
+      <ng-container *ngIf="ehTecnico || ehDiretoria">
+        <a class="kpi kpi--purple" routerLink="/Chamados/SobMinhaResponsabilidade" *ngIf="!isExcluido(usuarioID)">
+          <div class="kpi-icon"><i class="fa fa-user-cog"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-title">Sob minha responsabilidade</div>
+            <div class="kpi-value">{{ kpis.minhaRespAbertos }}</div>
+          </div>
+        </a>
+
+        <a class="kpi kpi--orange" routerLink="/Chamados/SobResponsabilidadeEquipe">
+          <div class="kpi-icon"><i class="fa fa-users"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-title" *ngIf="!ehDiretoria">Em responsabilidade da minha equipe</div>
+            <div class="kpi-title" *ngIf="ehDiretoria">Em responsabilidade dos colaboradores</div>
+            <div class="kpi-value">{{ kpis.equipeAbertos }}</div>
+          </div>
+        </a>
+
+        <a class="kpi kpi--red" routerLink="/Chamados/ChamadosNaoAtribuidos">
+          <div class="kpi-icon"><i class="fa fa-exclamation-circle"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-title">Não atribuídos</div>
+            <div class="kpi-value">{{ kpis.naoAtribuidosDR }}</div>
+          </div>
+        </a>
+
+        <a class="kpi kpi--yellow" *ngIf="ehTecnico && !isExcluido(usuarioID)">
+          <div class="kpi-icon"><i class="fa fa-star"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-title">Minha nota média</div>
+            <div class="kpi-value">{{ meusKpis.mediaAvaliacaoFmt }}</div>
+          </div>
+        </a>
+
+        <a class="kpi kpi--teal" *ngIf="ehTecnico && !isExcluido(usuarioID)">
+          <div class="kpi-icon"><i class="fa fa-hourglass-half"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-title">Meu MTTR</div>
+            <div class="kpi-value">{{ meusKpis.tempoMedioFmt }}</div>
+          </div>
+        </a>
+
+        <a class="kpi kpi--indigo" *ngIf="ehTecnico && !isExcluido(usuarioID)">
+          <div class="kpi-icon"><i class="fa fa-trophy"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-title">Minha posição no Rank</div>
+            <div class="kpi-value">{{ meusKpis.meuRank || '—' }}</div>
+            <div class="kpi-sub" *ngIf="rankingResolvidosEquipe.length">de {{ rankingResolvidosEquipe.length }}</div>
+          </div>
+        </a>
+
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="lists-section" *ngIf="!carregando">
+    <div class="lists-grid">
+      <div class="card card-ribbon card-ribbon--blue">
+        <div class="card-header">
+          <h3>Meus últimos abertos</h3>
+          <a routerLink="/Chamados/AbertosPorMim" class="link">Abrir</a>
+        </div>
+        <ul class="list">
+          <li *ngFor="let c of ultimosMeus" class="list-item" [attr.data-status]="c.Status">
+            <div class="list-icon"><i class="fa fa-ticket"></i></div>
+            <a [routerLink]="'/Chamados/Detalhes/' + c.ChamadoID" class="list-main">
+              <strong>{{ c.Titulo }}</strong>
+              <small>#{{ c.Protocolo }} • {{ formatarData(c.DataHora) }}</small>
+            </a>
+            <span class="badge" [ngClass]="badgeClass(c.Status)">{{ c.Status }}</span>
+          </li>
+          <li *ngIf="ultimosMeus.length === 0" class="list-empty">Sem chamados recentes</li>
+        </ul>
+      </div>
+
+      <div class="card card-ribbon card-ribbon--teal">
+        <div class="card-header">
+          <h3>Últimos abertos da minha equipe</h3>
+          <a routerLink="/Chamados/AbertosEquipe" class="link">Abrir</a>
+        </div>
+        <ul class="list">
+          <li *ngFor="let c of ultimosDepto" class="list-item" [attr.data-status]="c.Status">
+            <div class="list-icon"><i class="fa fa-building"></i></div>
+            <a [routerLink]="'/Chamados/Detalhes/' + c.ChamadoID" class="list-main">
+              <strong>{{ c.Titulo }}</strong>
+              <small>Solic: {{ nomeUsuario(c.UsuarioCriacaoID) }} • {{ formatarData(c.DataHora) }}</small>
+            </a>
+            <span class="badge" [ngClass]="badgeClass(c.Status)">{{ c.Status }}</span>
+          </li>
+          <li *ngIf="ultimosDepto.length === 0" class="list-empty">Sem chamados recentes</li>
+        </ul>
+      </div>
+
+      <ng-container *ngIf="ehTecnico || ehDiretoria">
+        <div class="card card-ribbon card-ribbon--purple" *ngIf="!isExcluido(usuarioID)">
+          <div class="card-header">
+            <h3>Estou atendendo</h3>
+            <a routerLink="/Chamados/SobMinhaResponsabilidade" class="link">Abrir</a>
+          </div>
+          <ul class="list">
+            <li *ngFor="let c of meusEmAtendimento" class="list-item" [attr.data-status]="c.Status">
+              <div class="list-icon"><i class="fa fa-user-cog"></i></div>
+              <a [routerLink]="'/Chamados/Detalhes/' + c.ChamadoID" class="list-main">
+                <strong>{{ c.Titulo }}</strong>
+                <small>#{{ c.Protocolo }} • {{ formatarData(c.DataHora) }}</small>
+              </a>
+              <span class="badge" [ngClass]="badgeClass(c.Status)">{{ c.Status }}</span>
+            </li>
+            <li *ngIf="meusEmAtendimento.length === 0" class="list-empty">Sem atendimento ativo</li>
+          </ul>
+        </div>
+
+        <div class="card card-ribbon card-ribbon--green">
+          <div class="card-header">
+            <h3>Minha equipe esta atendendo</h3>
+            <a routerLink="/Chamados/SobResponsabilidadeEquipe" class="link">Abrir</a>
+          </div>
+          <ul class="list">
+            <li *ngFor="let c of equipeEmAtendimento" class="list-item" [attr.data-status]="c.Status">
+              <div class="list-icon"><i class="fa fa-user-check"></i></div>
+              <a [routerLink]="'/Chamados/Detalhes/' + c.ChamadoID" class="list-main">
+                <strong>{{ c.Titulo }}</strong>
+                <small>Resp: {{ nomeUsuario(c.UsuarioResponsavelID) }} • {{ formatarData(c.DataHora) }}</small>
+              </a>
+              <span class="badge" [ngClass]="badgeClass(c.Status)">{{ c.Status }}</span>
+            </li>
+            <li *ngIf="equipeEmAtendimento.length === 0" class="list-empty">Ninguém em atendimento agora</li>
+          </ul>
+        </div>
+
+        <div class="card card-ribbon card-ribbon--red">
+          <div class="card-header">
+            <h3>Não atribuídos</h3>
+            <a routerLink="/Chamados/ChamadosNaoAtribuidos" class="link">Abrir</a>
+          </div>
+          <ul class="list">
+            <li *ngFor="let c of naoAtribuidosLista" class="list-item" [attr.data-status]="c.Status">
+              <div class="list-icon"><i class="fa fa-exclamation-circle"></i></div>
+              <a [routerLink]="'/Chamados/Detalhes/' + c.ChamadoID" class="list-main">
+                <strong>{{ c.Titulo }}</strong>
+                <small>Solic: {{ nomeUsuario(c.UsuarioCriacaoID) }} • {{ formatarData(c.DataHora) }}</small>
+              </a>
+              <span class="badge" [ngClass]="badgeClass(c.Status)">{{ c.Status }}</span>
+            </li>
+            <li *ngIf="naoAtribuidosLista.length === 0" class="list-empty">Tudo atribuídos</li>
+          </ul>
+        </div>
+
+        <div class="card card-ribbon card-ribbon--amber" *ngIf="ehTecnico || ehDiretoria">
+          <div class="card-header">
+            <h3 *ngIf="!ehDiretoria">Notas - Média da equipe</h3>
+            <h3 *ngIf="ehDiretoria">Notas - Média dos colaboradores</h3>
+          </div>
+
+          <ul class="list">
+            <li *ngFor="let r of mediasEquipe" class="list-item">
+              <div class="list-icon"><i class="fa fa-user"></i></div>
+              <div class="list-main">
+                <strong>{{ r.nome }}</strong>
+                <small>{{ r.qtd }} avaliaç{{ r.qtd === 1 ? 'ão' : 'ões' }}</small>
+              </div>
+              <span class="badge badge--rating">
+                <i class="fa fa-star"></i> {{ r.media | number:'1.1-2' }}
+              </span>
+            </li>
+
+            <li *ngIf="mediasEquipe.length === 0" class="list-empty">
+              Sem avaliações no período selecionado
+            </li>
+          </ul>
+        </div>
+
+        <div class="card card-ribbon card-ribbon--gold" *ngIf="ehTecnico || ehDiretoria">
+          <div class="card-header">
+            <h3 *ngIf="!ehDiretoria">Ranking – Resolvidos pela equipe</h3>
+            <h3 *ngIf="ehDiretoria">Ranking – Resolvidos pelos colaboradores</h3>
+          </div>
+
+          <ul class="list">
+            <li *ngFor="let r of rankingResolvidosEquipe; let i = index" class="list-item">
+              <div class="list-icon">
+                <span class="medal" [ngClass]="medalClass(i)" [attr.aria-label]="'Posição ' + (i+1)">
+                  <i class="fa" [ngClass]="{
+               'fa-trophy': i < 3,
+               'fa-hashtag': i >= 3
+             }"></i>
+                </span>
+              </div>
+
+              <div class="list-main">
+                <strong>{{ i + 1 }}º • {{ r.nome }}</strong>
+                <small>{{ r.resolvidos }} chamado{{ r.resolvidos === 1 ? '' : 's' }} finalizado{{ r.resolvidos === 1 ?
+                  '' : 's' }}</small>
+              </div>
+
+              <span class="badge badge--neutral" *ngIf="i >= 3">{{ r.resolvidos }}</span>
+              <span class="badge badge--medal" *ngIf="i < 3">{{ r.resolvidos }}</span>
+            </li>
+
+            <li *ngIf="rankingResolvidosEquipe.length === 0" class="list-empty">
+              Sem resoluções no período selecionado
+            </li>
+          </ul>
+        </div>
+
+        <div class="card card-ribbon card-ribbon--teal" *ngIf="ehTecnico || ehDiretoria">
+          <div class="card-header">
+            <h3 *ngIf="!ehDiretoria">Tempo médio de resolução da equipe</h3>
+            <h3 *ngIf="ehDiretoria">Tempo médio de resolução dos colaboradores</h3>
+          </div>
+
+          <ul class="list">
+            <li *ngFor="let r of avgResolucaoEquipe" class="list-item">
+              <div class="list-icon"><i class="fa fa-hourglass-half"></i></div>
+              <div class="list-main">
+                <strong>{{ r.nome }}</strong>
+                <small>{{ r.qtd }} chamado{{ r.qtd === 1 ? '' : 's' }} finalizado{{ r.qtd === 1 ? '' : 's' }}</small>
+              </div>
+              <span class="badge badge--andamento">
+                {{ r.mediaFmt }}
+              </span>
+            </li>
+            <li *ngIf="avgResolucaoEquipe.length === 0" class="list-empty">
+              Sem dados no período selecionado
+            </li>
+          </ul>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>

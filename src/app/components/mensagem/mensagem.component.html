@@ -1,0 +1,8 @@
+<div class="caixaMensagem" *ngIf="mensagemService.mensagem">
+  <div class="mensagem">
+    <div class="cabecalho">
+      <span>{{ mensagemService.mensagem }}</span>
+      <i class="fa fa-times botaoFecharMensagem" (click)="mensagemService.limparMensagem()"></i>
+    </div>
+  </div>
+</div>

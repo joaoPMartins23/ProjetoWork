@@ -1,0 +1,11 @@
+<section class="main" [ngClass]="{ 'menu-fechado': menuFechado }">
+  <app-menu-lateral (menuFechadoChange)="menuFechado = $event"></app-menu-lateral>
+
+  <app-mensagem></app-mensagem>
+
+  <div class="corpo">
+    <router-outlet></router-outlet>
+
+    <app-notificacao></app-notificacao>
+  </div>
+</section>

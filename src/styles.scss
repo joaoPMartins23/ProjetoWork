@@ -1,0 +1,79 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import "~@ng-select/ng-select/themes/default.theme.css";
+
+html,
+body {
+  height: 100%;
+  font-family: "Rubik", sans-serif;
+}
+body {
+  margin: 0;
+}
+
+.ng-select {
+  width: 100%;
+  font-size: .9rem;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.ng-dropdown-panel {
+  border: 1px solid #8f8f8f;
+}
+
+@media print {
+  /* Esconde tudo do layout quando estiver em modo impressão */
+  body.print-mode app-sidebar,
+  body.print-mode app-menu-lateral,
+  body.print-mode app-header,
+
+  body.print-mode nav,
+  body.print-mode aside,
+  body.print-mode .sidebar,
+  body.print-mode .menu-lateral,
+  body.print-mode .topbar,
+  body.print-mode .navbar {
+    display: none !important;
+  }
+
+  body.print-mode .app-shell,
+  body.print-mode .layout,
+  body.print-mode .main,
+  body.print-mode .content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Mostra só o relatório */
+  body.print-mode .print-page {
+    display: block !important;
+  }
+}
+
+@media print {
+  body.print-mode app-sidebar,
+  body.print-mode app-header,
+  body.print-mode app-topbar,
+  body.print-mode app-notificacao,
+  body.print-mode app-bell,
+  body.print-mode .notificacao,
+  body.print-mode .bell,
+  body.print-mode header,
+  body.print-mode nav,
+  body.print-mode aside {
+    display: none !important;
+  }
+
+  /* garante que o conteúdo não fique "deslocado" pelo layout */
+  body.print-mode .content,
+  body.print-mode .main,
+  body.print-mode .container,
+  body.print-mode .wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+

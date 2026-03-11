@@ -1,0 +1,179 @@
+<section class="novo-chamado-wrapper">
+  <div *ngIf="carregando" class="area-carregando">
+    <div class="spinner"></div>
+  </div>
+
+  <form [formGroup]="formulario" (ngSubmit)="onSubmit()" #formDir="ngForm" class="novo-chamado-form"
+    *ngIf="!carregando">
+    <div class="lado-esquerdo">
+      <h2>Novo Chamado Recorrente</h2>
+
+      <div class="campo">
+        <label id="label_solicitante">
+          Solicitante
+          <span *ngIf="formulario.get('UsuarioCriacaoID')?.value == ''" (click)="meAtribuirComoSolicitante()">Sou o
+            solicitante</span>
+        </label>
+        <ng-select class="cutom" [clearable]="false" formControlName="UsuarioCriacaoID">
+          <ng-option *ngFor="let u of usuarios" [value]="u.UsuarioID">{{ u.Nome }}</ng-option>
+        </ng-select>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label
+            [style.color]="formulario.get('DepartamentoResponsavelID')?.invalid && formDir.submitted ? 'red': '#555'">Departamento
+            Responsável</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="DepartamentoResponsavelID"
+            (change)="formulario.get('UsuarioResponsavelID')?.setValue('')">
+            <ng-option *ngFor="let d of departamentosResponsaveis" [value]="d.DepartamentoResponsavelID">
+              {{ d.DepartamentoResponsavel }}
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label>Responsável</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="UsuarioResponsavelID">
+            <ng-option *ngFor="let u of usuariosTecnicosPorDepartamento" [value]="u.UsuarioID">
+              {{ u.Nome }}
+            </ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label
+            [style.color]="formulario.get('ServicoID')?.invalid && formDir.submitted ? 'red': '#555'">Serviço</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="ServicoID"
+            (change)="formulario.get('TipoServicoID')?.setValue('')">
+            <ng-option *ngFor="let s of servicosPorDepartamento" [value]="s.ServicoID">{{ s.Servico }}</ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label [style.color]="formulario.get('TipoServicoID')?.invalid && formDir.submitted ? 'red': '#555'">Tipo de
+            Serviço</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="TipoServicoID">
+            <ng-option *ngFor="let t of tiposServico" [value]="t.TipoServicoID">{{ t.TipoServico }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo"
+          *ngIf="formulario.get('DepartamentoResponsavelID')?.value == '17069ABC-9CE0-4E60-B119-79E20B05E6B0'">
+          <label>Bloco</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="BlocoID">
+            <ng-option *ngFor="let b of blocos" [value]="b.BlocoID">{{ b.Bloco }}</ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label
+            [style.color]="formulario.get('Prioridade')?.invalid && formDir.submitted ? 'red': '#555'">Prioridade</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="Prioridade">
+            <ng-option *ngFor="let p of prioridades" [value]="p.valor">{{ p.nome }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+    </div>
+
+    <div class="lado-direito">
+      <div class="campo">
+        <label [style.color]="formulario.get('Titulo')?.invalid && formDir.submitted ? 'red': '#555'">Assunto</label>
+        <input type="text" formControlName="Titulo" placeholder="Digite o assunto do chamado" />
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label
+            [style.color]="formulario.get('Frequencia')?.invalid && formDir.submitted ? 'red': '#555'">Frequência</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="Frequencia">
+            <ng-option *ngFor="let f of frequencias" [value]="f">{{ f }}</ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label [style.color]="formulario.get('Periodo')?.invalid && formDir.submitted ? 'red': '#555'">Período</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="Periodo">
+            <ng-option *ngFor="let p of periodos" [value]="p">{{ p }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="grupo-linha date-group">
+        <div class="campo">
+          <div class="label-row">
+            <label [style.color]="formulario.get('DataInicio')?.invalid ? 'red': '#555'">Data Início</label>
+          </div>
+
+          <div class="input-with-icon">
+            <input type="datetime-local" formControlName="DataInicio" />
+            <i class="i-calendar" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="label-row">
+            <label>Data Fim (opcional)</label>
+
+            <button type="button" class="btn-link" *ngIf="formulario.get('DataFim')?.value"
+              (click)="formulario.get('DataFim')?.setValue('')">
+              Limpar
+            </button>
+          </div>
+
+          <div class="input-with-icon">
+            <input type="datetime-local" formControlName="DataFim" />
+            <i class="i-calendar" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="campo" *ngIf="formulario.get('Frequencia')?.value === 'SEMANAL'">
+        <label>Dias da semana</label>
+        <div class="dias-semana">
+          <label><input type="checkbox" formControlName="Dom" /> Dom</label>
+          <label><input type="checkbox" formControlName="Seg" /> Seg</label>
+          <label><input type="checkbox" formControlName="Ter" /> Ter</label>
+          <label><input type="checkbox" formControlName="Qua" /> Qua</label>
+          <label><input type="checkbox" formControlName="Qui" /> Qui</label>
+          <label><input type="checkbox" formControlName="Sex" /> Sex</label>
+          <label><input type="checkbox" formControlName="Sab" /> Sáb</label>
+        </div>
+        <small class="hint">Marque pelo menos um dia.</small>
+      </div>
+
+      <div class="grupo-linha" *ngIf="formulario.get('Frequencia')?.value === 'MENSAL'">
+        <div class="campo">
+          <label>Dia do mês</label>
+          <input type="number" min="1" max="31" formControlName="DiaDoMes" placeholder="1..31" />
+        </div>
+      </div>
+
+      <div class="grupo-linha" *ngIf="formulario.get('Frequencia')?.value === 'ANUAL'">
+        <div class="campo">
+          <label>Dia do mês</label>
+          <input type="number" min="1" max="31" formControlName="DiaDoMes" placeholder="1..31" />
+        </div>
+        <div class="campo">
+          <label>Mês do ano</label>
+          <input type="number" min="1" max="12" formControlName="MesDoAno" placeholder="1..12" />
+        </div>
+      </div>
+
+      <div class="campo">
+        <label
+          [style.color]="formulario.get('Mensagem')?.invalid && formDir.submitted? 'red': '#555'">Mensagem</label>
+        <textarea formControlName="Mensagem" placeholder="Descreva o problema ou solicitação..."></textarea>
+      </div>
+
+      <div class="botoes">
+        <button type="submit">Salvar Chamado Recorrente</button>
+      </div>
+    </div>
+  </form>
+</section>

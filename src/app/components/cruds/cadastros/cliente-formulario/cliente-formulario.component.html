@@ -1,0 +1,136 @@
+<section>
+  <form [formGroup]="formularioCliente" (ngSubmit)="onSubmit()" class="formulario-cliente" #formDir="ngForm">
+
+    <div class="cabecalhoFormulario">
+      <h2>
+        <i class="fa fa-arrow-left" routerLink="/Clientes"></i>
+        {{ urlAtual.length == 2 ? 'Criar' : 'Editar' }} Cliente
+      </h2>
+      <i class="fa fa-times" routerLink="/Clientes"></i>
+    </div>
+
+    <div *ngIf="carregando" class="area-carregando">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="modo-criacao" *ngIf="!carregando && urlAtual.length == 2">
+      <button type="button" [class.ativo]="modoCriacao === 'manual'" (click)="definirModoCriacao('manual')">
+        Criar manualmente
+      </button>
+
+      <button type="button" [class.ativo]="modoCriacao === 'busca'" (click)="definirModoCriacao('busca')">
+        Criar por CPF/CNPJ
+      </button>
+    </div>
+
+    <div class="busca-cnpj" *ngIf="!carregando && modoCriacao === 'busca' && urlAtual.length == 2">
+      <input type="text" formControlName="Cnpj" (input)="mascararDocumento()" placeholder="CPF ou CNPJ" />
+
+      <input type="text" formControlName="NomeCliente" placeholder="Nome do cliente" />
+
+      <button type="button" (click)="buscarClientePorDocumento()"
+        [disabled]="buscandoDocumento || !dadosValidosParaBusca()">
+        {{ buscandoDocumento ? 'Criando cliente...' : 'Criar automaticamente' }}
+      </button>
+
+
+      <p class="hint">
+        O cliente será criado automaticamente se os dados forem encontrados.
+      </p>
+    </div>
+
+    <div *ngIf="!carregando && modoCriacao === 'manual'">
+      <div class="form-linha">
+        <div>
+          <label>CPF/CNPJ</label>
+          <input type="text" formControlName="Cnpj" (input)="mascararDocumento()" />
+        </div>
+
+        <div>
+          <label>Código Alternativo</label>
+          <input type="text" formControlName="Codigo" />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div>
+          <label>Razão Social</label>
+          <input type="text" formControlName="RazaoSocial" />
+        </div>
+
+        <div>
+          <label>Nome do Cliente</label>
+          <input type="text" formControlName="NomeCliente" />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div>
+          <label>Nome Fantasia</label>
+          <input type="text" formControlName="NomeFantasia" />
+        </div>
+
+        <div>
+          <label>Telefone</label>
+          <input type="tel" formControlName="Telefone" (input)="mascararTelefone()" />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div>
+          <label>CEP</label>
+          <input type="text" formControlName="Cep" (input)="mascararCep()" />
+        </div>
+
+        <div>
+          <label>Tipo Logradouro</label>
+          <input type="text" formControlName="TipoLogradouro" />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div>
+          <label>Logradouro</label>
+          <input type="text" formControlName="Logradouro" />
+        </div>
+
+        <div>
+          <label>Número</label>
+          <input type="text" formControlName="NumeroLogradouro" />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div>
+          <label>Complemento</label>
+          <input type="text" formControlName="Complemento" />
+        </div>
+
+        <div>
+          <label>Bairro</label>
+          <input type="text" formControlName="Bairro" />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div>
+          <label>Cidade</label>
+          <input type="text" formControlName="Cidade" />
+        </div>
+
+        <div>
+          <label>UF</label>
+          <input type="text" formControlName="Uf" maxlength="2" />
+        </div>
+      </div>
+
+      <div class="botoesFormulario" *ngIf="!carregando">
+
+        <button type="submit" class="btn-salvar">
+          <i class="fa fa-save"></i>
+          Salvar
+        </button>
+      </div>
+    </div>
+  </form>
+</section>

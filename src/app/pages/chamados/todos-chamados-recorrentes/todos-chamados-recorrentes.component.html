@@ -1,0 +1,103 @@
+<section>
+  <div class="cabecalho">
+    <h1>Chamados Recorrentes</h1>
+  </div>
+
+  <div *ngIf="carregando" class="area-carregando">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="conteudo" *ngIf="!carregando">
+    <div class="filtros-container pretty">
+      <div class="filters-top">
+        <div class="filters-search">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Pesquisar por qualquer campo…" [ngModel]="termoPesquisa"
+            (ngModelChange)="aplicarFiltro()" />
+
+          <button type="button" class="btn" (click)="limparTodosFiltros()" title="Limpar todos os filtros">
+            <img src="/assets/images/icons/semFiltro.png" alt="">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabela-wrapper">
+      <table class="tabela-generica" *ngIf="chamadosEnviar.length > 0">
+        <thead>
+          <tr>
+            <th *ngFor="let cabecalho of cabecalhosEnviar" (click)="ordenarPor(cabecalho.CampoChave)"
+              class="th-sortable" [class.ativo]="criterioOrdenacao.campo === cabecalho.CampoChave">
+              {{ cabecalho.CampoTitulo }}
+              <i class="fa" [ngClass]="{
+                   'fa-sort': criterioOrdenacao.campo !== cabecalho.CampoChave,
+                   'fa-sort-up': criterioOrdenacao.campo === cabecalho.CampoChave && criterioOrdenacao.direcao === 'asc',
+                   'fa-sort-down': criterioOrdenacao.campo === cabecalho.CampoChave && criterioOrdenacao.direcao === 'desc'
+                 }">
+              </i>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody (mouseleave)="onRowLeave()">
+          <tr
+            *ngFor="let linha of chamadosEnviar | paginate: { itemsPerPage: itensPorPagina, currentPage: paginaAtual }"
+            routerLink="/Chamados/Detalhes/Recorrentes/{{linha.ID}}" (mouseenter)="onRowEnter($event, linha)">
+            <td *ngFor="let cabecalho of cabecalhosEnviar; let i = index"
+              [attr.data-label]="cabecalhosEditadosEnviar[i].CampoTitulo">
+
+              <ng-container [ngSwitch]="cabecalhosEditadosEnviar[i].CampoTitulo">
+
+                <ng-container *ngSwitchCase="'Ativo'">
+                  <i class="fa"
+                    [ngClass]="{ 'fa-check': linha['Ativo'] === 'Sim', 'fa-times': linha['Ativo'] === 'Não' }"></i>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Prioridade'">
+                  <i class="fa fa-flag" [ngClass]="{
+                      'urgencia-baixa': linha.Prioridade === 'Baixa',
+                      'urgencia-media': linha.Prioridade === 'Média',
+                      'urgencia-alta': linha.Prioridade === 'Alta',
+                      'urgencia-urgente': linha.Prioridade === 'Urgente'
+                  }" [title]="'Prioridade: ' + linha.Prioridade"></i>
+                </ng-container>
+
+                <ng-container *ngSwitchDefault>
+                  {{ linha[cabecalhosEditadosEnviar[i].CampoTitulo] }}
+                </ng-container>
+
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hover-preview" *ngIf="preview.visible" [style.top.px]="preview.y" [style.left.px]="preview.x">
+        <div class="hp-head">
+          <strong>Assunto:</strong> {{ preview.data?.Assunto }}
+        </div>
+
+        <div class="hp-row"><strong>Solicitante:</strong> <span>{{ preview.data?.Solicitante }}</span></div>
+        <div class="hp-row"><strong>Responsável:</strong> <span>{{ preview.data?.Responsavel }}</span></div>
+        <div class="hp-row"><strong>Departamento:</strong> <span>{{ preview.data?.Departamento }}</span></div>
+        <div class="hp-row"><strong>Serviço:</strong> <span>{{ preview.data?.Servico }}</span></div>
+        <div class="hp-row"><strong>Frequência:</strong> <span>{{ preview.data?.Frequencia }}</span></div>
+        <div class="hp-row"><strong>Período:</strong> <span>{{ preview.data?.Periodo }}</span></div>
+        <div class="hp-row"><strong>Início:</strong> <span>{{ preview.data?.DataInicio }}</span></div>
+        <div class="hp-row"><strong>Fim:</strong> <span>{{ preview.data?.DataFim }}</span></div>
+        <div class="hp-row"><strong>Dias semana:</strong> <span>{{ preview.data?.DiasSemana }}</span></div>
+        <div class="hp-row"><strong>Dia/Mês:</strong> <span>{{ preview.data?.DiaMes }} / {{ preview.data?.MesAno
+            }}</span></div>
+        <div class="hp-row"><strong>Próxima:</strong> <span>{{ preview.data?.Proxima }}</span></div>
+      </div>
+
+      <pagination-controls (pageChange)="onPaginaChange($event)" previousLabel="" nextLabel="" class="paginacao"
+        *ngIf="chamadosEnviar.length > 0">
+      </pagination-controls>
+
+      <div class="mensagem-vazia" *ngIf="chamadosEnviar.length === 0">
+        <p>Nenhum chamado recorrente encontrado.</p>
+      </div>
+    </div>
+  </div>
+</section>

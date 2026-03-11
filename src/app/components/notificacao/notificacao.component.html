@@ -1,0 +1,28 @@
+<div class="notificacao-container" tabindex="0" (blur)="fecharDropdown()">
+  <div class="icone-sino" (click)="alternarDropdown()">
+    <i class="fas fa-bell"></i>
+    <span class="badge" *ngIf="notificacoes.length > 0">{{ notificacoes.length }}</span>
+  </div>
+
+  <div class="dropdown" *ngIf="dropdownAberto">
+    <div class="dropdown-header">
+      <span>Notificações</span>
+
+      <i class="fa fa-trash" (click)="limparTodasNotificacoes()"></i>
+    </div>
+
+    <ul class="lista-notificacoes" *ngIf="notificacoes.length > 0">
+      <li *ngFor="let notificacao of notificacoes" (click)="navegarNotificacao(notificacao.NotificacaoID, notificacao.UrlDestino)">
+        <i class="{{ verificarIconeNotificacao(notificacao.Mensagem) }} icone"></i>
+        <div class="conteudo">
+          <div class="mensagem">{{ notificacao.Mensagem }}</div>
+          <div class="tempo">{{ tempoFormatado(notificacao.DataHoraCriacao) }}</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="sem-notificacoes" *ngIf="notificacoes.length === 0">
+      Nenhuma notificação no momento.
+    </div>
+  </div>
+</div>

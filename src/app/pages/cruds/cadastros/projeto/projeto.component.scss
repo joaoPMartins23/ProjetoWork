@@ -1,0 +1,66 @@
+section {
+  padding: 2rem;
+
+  .cabecalho {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #1e1e2f;
+      border-left: 4px solid #00A74A;
+      padding-left: 1rem;
+    }
+  }
+
+  .area-carregando {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 4px solid #ccc;
+      border-top: 4px solid #00A74A;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  .erroApi {
+    background-color: #fee2e2;
+    border: 1px solid #f87171;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+
+    span {
+      font-weight: 600;
+    }
+  }
+}
+
+// Responsivo
+@media (max-width: 768px) {
+  section {
+    padding: 1rem;
+
+    .cabecalho h1 {
+      font-size: 1.4rem;
+    }
+
+    .conteudo {
+      padding: 1rem;
+    }
+  }
+}

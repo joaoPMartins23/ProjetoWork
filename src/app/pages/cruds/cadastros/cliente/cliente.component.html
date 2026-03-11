@@ -1,0 +1,22 @@
+<section>
+    <div class="cabecalho">
+        <h1>Clientes SAC</h1>
+    </div>
+
+    <div *ngIf="carregando" class="area-carregando">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="erroApi" *ngIf="!carregando && mensagemErro != ''">
+        <p>Ocorreu um erro ao requisitar a API: <span>{{mensagemErro}}</span></p>
+        <p>Tente novamente mais tarde o entre em contato com o departamento da TI.</p>
+    </div>
+
+    <div class="conteudo" *ngIf="!carregando && mensagemErro == ''">
+        <app-tabela-generica [cabecalhos]="cabecalhosEnviar" [cabecalhosEditados]="cabecalhosEditadosEnviar"
+            [dados]="clienteEnviar">
+        </app-tabela-generica>
+
+        <app-cliente-formulario *ngIf="urlAtual.length != 1"></app-cliente-formulario>
+    </div>
+</section>

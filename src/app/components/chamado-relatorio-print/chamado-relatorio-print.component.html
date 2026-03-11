@@ -1,0 +1,80 @@
+<div *ngIf="carregando" class="loading">Carregando…</div>
+
+<div *ngIf="!carregando" class="print-page" #pdfArea>
+
+  <header class="report-header">
+    <div class="header-left">
+      <h1>Relatório do Chamado</h1>
+
+      <div class="chips">
+        <span class="chip">Protocolo: {{ chamado.Protocolo || '—' }}</span>
+        <span class="chip chip--muted">Status: {{ chamado.Status || '—' }}</span>
+        <span class="chip chip--muted">Gerado em: {{ geradoEm | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="section no-break" *ngIf="camposChamado.length">
+    <div class="section-title">
+      <h2>Informações do Chamado</h2>
+      <p>Dados gerais e responsáveis</p>
+    </div>
+
+    <div class="grid">
+      <div class="field" [class.wide]="c.wide" *ngFor="let c of camposChamado">
+        <div class="label">{{ c.label }}</div>
+        <div class="value">{{ c.value || '—' }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section no-break" *ngIf="camposCliente.length">
+    <div class="section-title">
+      <h2>Informações do Cliente</h2>
+      <p>Cadastro e contato</p>
+    </div>
+
+    <div class="grid">
+      <div class="field" [class.wide]="c.wide" *ngFor="let c of camposCliente">
+        <div class="label">{{ c.label }}</div>
+        <div class="value">{{ c.value || '—' }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section no-break" *ngIf="camposProduto.length">
+    <div class="section-title">
+      <h2>Informações do Produto</h2>
+      <p>Dados SAC do item reportado</p>
+    </div>
+
+    <div class="grid">
+      <div class="field" [class.wide]="c.wide" *ngFor="let c of camposProduto">
+        <div class="label">{{ c.label }}</div>
+        <div class="value">{{ c.value || '—' }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section no-break" *ngIf="mensagens.length">
+    <div class="section-title">
+      <h2>Registro de Mensagens</h2>
+      <p>Interações e andamento</p>
+    </div>
+
+    <article class="msg" [class.no-break]="m.imagens.length <= 3" [class.allow-break]="m.imagens.length > 3"
+      *ngFor="let m of mensagens">
+      <div class="msg-head">
+        <strong>{{ m.autor }}</strong>
+        <span>{{ m.data }}</span>
+        <span class="tag" *ngIf="m.interna">Interna</span>
+      </div>
+
+      <p class="msg-body">{{ m.texto }}</p>
+
+      <div class="msg-media" *ngIf="m.imagens.length">
+        <img *ngFor="let url of m.imagens" [src]="url" loading="eager" class="msg-img" (error)="onImgError($event)" />
+      </div>
+    </article>
+  </section>
+</div>

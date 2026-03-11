@@ -1,0 +1,76 @@
+<section class="tela-login">
+  <aside class="imagem-lateral"></aside>
+
+  <main class="area-formulario">
+    <article class="caixa-formulario">
+      <figure class="logo">
+        <img src="/assets/images/logos/projetoWork.png" alt="projetowork" />
+      </figure>
+
+      <header class="cabecalho">
+        <h1>{{ recuperandoSenha && recuperacaoConcluida? 'Sucesso!': 'Projeto Work' }}</h1>
+        <p>{{ recuperandoSenha && recuperacaoConcluida? '': recuperandoSenha? 'Informe seu e-mail para recuperar sua senha': 'Informe seu e-mail e senha para entrar' }}</p>
+      </header>
+
+      <div *ngIf="carregando" class="area-carregando">
+        <div class="spinner"></div>
+      </div>
+
+      <form [formGroup]="formularioLogin" (ngSubmit)="onSubmit()" *ngIf="!carregando">
+        <ng-container *ngIf="recuperandoSenha && recuperacaoConcluida; else modoRecuperacaoOuLogin">
+          <div class="mensagem-confirmacao">
+            <p>Enviamos um e-mail com instruções para redefinir sua senha, verifique sua caixa de entrada ou spam.</p>
+            <button type="button" (click)="voltarParaLogin()">Voltar para login</button>
+          </div>
+        </ng-container>
+
+        <ng-template #modoRecuperacaoOuLogin>
+          <ng-container *ngIf="recuperandoSenha; else loginForm">
+            <div class="grupo-campo">
+              <label for="emailRecuperacao">E-mail de Recuperação</label>
+              <input id="emailRecuperacao" type="email" formControlName="Email" placeholder="seuemail@gmail.com" />
+            </div>
+
+            <button type="submit">Enviar recuperação</button>
+
+            <footer class="rodape-formulario">
+              <p><a href="#" (click)="alternarModo($event)">Voltar para login</a></p>
+            </footer>
+          </ng-container>
+
+          <ng-template #loginForm>
+
+            <p *ngIf="erroLogar != ''" class="mensagemErro">{{ erroLogar }}</p>
+
+            <div class="grupo-campo">
+              <label [ngClass]="{ 'erro-label': temErro('Email') }" for="email">
+                {{ temErro('Email') ? obterMensagemErro('Email') : 'E-mail' }}
+              </label>
+              <input id="email" type="email" formControlName="Email" [ngClass]="{ 'campo-invalido': temErro('Email') }"
+                placeholder="seuemail@gmail.com" />
+            </div>
+
+            <div class="grupo-campo senha-com-icone">
+              <label [ngClass]="{ 'erro-label': temErro('Senha') }" for="senha">
+                {{ temErro('Senha') ? obterMensagemErro('Senha') : 'Senha' }}
+              </label>
+              <div class="input-container">
+                <input [type]="mostrarSenha ? 'text' : 'password'" id="senha" formControlName="Senha"
+                  [ngClass]="{ 'campo-invalido': temErro('Senha') }" placeholder="********" />
+                <button type="button" class="botao-olho" (click)="alternarVisibilidadeSenha()" tabindex="-1">
+                  <i class="fa fa-{{ !mostrarSenha ? 'eye-slash' : 'eye' }}"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit">Entrar</button>
+
+            <footer class="rodape-formulario">
+              <p>Esqueceu a senha? <a href="#" (click)="alternarModo($event)">Clique aqui!</a></p>
+            </footer>
+          </ng-template>
+        </ng-template>
+      </form>
+    </article>
+  </main>
+</section>

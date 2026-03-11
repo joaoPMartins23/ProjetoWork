@@ -1,0 +1,599 @@
+/* ===========================================
+   DASHBOARD FANCY — SCSS FLAT (sem gradientes)
+   - Paleta fixa por componente (sem repetição)
+   - Cores sólidas, alto contraste
+=========================================== */
+
+/* ======= TOKENS ======= */
+.dashboard-fancy {
+  /* base */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --text: #0b1220;
+  --muted: #6e7a91;
+  --line: #e6e8ee;
+
+  /* marca neutra */
+  --brand: #00a74a; /* NÃO usada para blocos coloridos, apenas acentos */
+  --brand-700: #029c44;
+
+  /* ===== Cores exclusivas por componente ===== */
+
+  /* 1) KPI (8 blocos, todos diferentes) */
+  --kpi-green: #16a34a;
+  --kpi-blue: #1d4ed8;
+  --kpi-purple: #7c3aed;
+  --kpi-orange: #ea580c;
+  --kpi-red: #dc2626;
+  --kpi-teal: #0d9488;
+  --kpi-yellow: #ddd915;
+  --kpi-indigo: #4338ca;
+
+  /* 2) Ribbons dos cards (cores únicas; não repetem KPI) */
+  --rbn-green: #ea580c; /* diferente do kpi-green */
+  --rbn-blue: #16a34a; /* diferente do kpi-blue  */
+  --rbn-teal: #1d4ed8; /* diferente do kpi-teal  */
+  --rbn-purple: #7c3aed; /* diferente do kpi-purple*/
+  --rbn-orange: #ea580c; /* diferente do kpi-orange*/
+  --rbn-red: #dc2626; /* diferente do kpi-red   */
+  --rbn-light: #0d9488; /* “light” exclusivo       */
+  --rbn-amber: #ddd915; /* amarelo exclusivo       */
+  --rbn-gold: #0d9488; /* “gold” estilizado, não bate com medal */
+
+  /* 3) Badges (status) — cores exclusivas */
+  --bdg-aberto: #3b82f6; /* não repete ribbon/kpi */
+  --bdg-andamento: #2dd4bf;
+  --bdg-espera: #f59e0b;
+  --bdg-finalizado: #22c55e;
+  --bdg-cancelado: #f43f5e;
+  --bdg-default: #e5e7eb;
+
+  /* 4) List-status barra lateral (outra escala, sem repetir) */
+  --lst-aberto: #1e40af;
+  --lst-andamento: #0f766e;
+  --lst-espera: #b45309;
+  --lst-finalizado: #166534;
+  --lst-cancelado: #b91c1c;
+
+  /* 5) Medalhas (ranking) — sólidas, únicas */
+  --medal-gold: #d97706;
+  --medal-silver: #6b7280;
+  --medal-bronze: #92400e;
+}
+
+/* Tema escuro opcional (sem gradiente, mantém unicidade) */
+.dashboard-fancy.theme--dark {
+  --bg: #0b1220;
+  --surface: #0f172a;
+  --text: #e5e7eb;
+  --muted: #a3adbd;
+  --line: #1f2a44;
+
+  /* mantemos as cores planas; sem alteração para evitar choque */
+}
+
+/* ======= HELPERS ======= */
+@mixin soft-shadow($a: 12px, $b: 28px, $alpha: 0.1) {
+  box-shadow: 0 $a $b rgba(15, 23, 42, $alpha);
+}
+@mixin focus-ring($c: #2563eb) {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* ======= LAYOUT BASE ======= */
+.dashboard-fancy {
+  position: relative;
+  min-height: 100vh;
+  padding: 28px;
+  color: var(--text);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* ======= HEADER ======= */
+.dashboard-header {
+  margin-bottom: 22px;
+
+  .header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: var(--text);
+    border-left: 4px solid var(--brand);
+    padding-left: 1rem;
+  }
+
+  small {
+    color: var(--muted);
+  }
+}
+
+/* ======= LOADING ======= */
+.area-carregando {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 180px;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #cbd5e1;
+    border-top: 5px solid var(--brand);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ======= CARD ======= */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  @include soft-shadow();
+  max-height: 500px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+
+  h2,
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .link {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #475569;
+    font-weight: 700;
+    font-size: 12px;
+
+    &:hover {
+      text-decoration: underline;
+      color: #0f172a;
+    }
+  }
+}
+
+/* ======= RIBBONS (sólidas) ======= */
+.card-ribbon {
+  overflow: hidden;
+}
+.card-ribbon::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 7px;
+  background: var(--brand);
+}
+.card-ribbon--green::before {
+  background: var(--rbn-green);
+}
+.card-ribbon--blue::before {
+  background: var(--rbn-blue);
+}
+.card-ribbon--teal::before {
+  background: var(--rbn-teal);
+}
+.card-ribbon--purple::before {
+  background: var(--rbn-purple);
+}
+.card-ribbon--orange::before {
+  background: var(--rbn-orange);
+}
+.card-ribbon--red::before {
+  background: var(--rbn-red);
+}
+.card-ribbon--light::before {
+  background: var(--rbn-light);
+}
+.card-ribbon--amber::before {
+  background: var(--rbn-amber);
+}
+.card-ribbon--gold::before {
+  background: var(--rbn-gold);
+}
+
+/* ======= FILTERS ======= */
+.filters-card {
+  margin-bottom: 1em;
+  padding: 20px 22px 14px;
+  position: relative;
+  z-index: 10;
+}
+.filters-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  align-items: end;
+}
+.f-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.f-campo label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+.f-campo input,
+.f-campo select {
+  border: 1.5px solid #d2d2d2;
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 8px 14px;
+  font-size: 15px;
+  transition: box-shadow 0.18s, border-color 0.18s, transform 0.06s;
+
+  &:focus {
+    border-color: #2563eb;
+    @include focus-ring(#2563eb);
+  }
+}
+.f-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  .btn.ghost {
+    background: #ffffff;
+    border: 1px solid #dbe4f0;
+    color: #0b1220;
+    box-shadow: none;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    &:hover {
+      background: #f8fafc;
+    }
+  }
+}
+
+/* ng-select (mantém flat) */
+::ng-deep .ng-select-container {
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1.5px solid #d2d2d2;
+  background: var(--surface);
+}
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+}
+:host ::ng-deep .ng-dropdown-panel {
+  z-index: 10050 !important;
+}
+
+/* ======= KPI SECTION ======= */
+.kpi-section {
+  margin: 18px 0;
+  display: grid;
+}
+.kpi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+}
+
+.kpi {
+    flex: 0 0 320px;   /* não cresce, não encolhe, base = 320px */
+  max-width: 320px;  /* garante consistência */
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: var(--text);
+  background: #ffffff;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  transition: transform 0.14s, box-shadow 0.14s, filter 0.14s;
+  @include soft-shadow(10px, 24px, 0.08);
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.kpi-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  border: 2px solid transparent; /* para foco/aria */
+}
+.kpi-body {
+  display: grid;
+  gap: 2px;
+}
+.kpi-title {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.25px;
+  opacity: 0.9;
+}
+.kpi-value {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Cores exclusivas para cada KPI */
+.kpi--green .kpi-icon {
+  background: var(--kpi-green);
+}
+.kpi--blue .kpi-icon {
+  background: var(--kpi-blue);
+}
+.kpi--purple .kpi-icon {
+  background: var(--kpi-purple);
+}
+.kpi--orange .kpi-icon {
+  background: var(--kpi-orange);
+}
+.kpi--red .kpi-icon {
+  background: var(--kpi-red);
+}
+.kpi--teal .kpi-icon {
+  background: var(--kpi-teal);
+}
+.kpi--yellow .kpi-icon {
+  background: var(--kpi-yellow);
+}
+.kpi--indigo .kpi-icon {
+  background: var(--kpi-indigo);
+}
+
+/* ======= CHIPS ======= */
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+}
+.chip i {
+  opacity: 0.85;
+}
+.chip-muted {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ======= LISTS ======= */
+.lists-section {
+  margin-top: 18px;
+  display: grid;
+  place-content: center;
+}
+.lists-grid {
+  display: grid;
+  gap: 16px;
+  max-width: 100vw;
+  margin-inline: auto;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 420px));
+  justify-content: center;
+}
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 500px;
+  overflow: auto;
+}
+.list-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 16px;
+  border-bottom: 1px dashed var(--line);
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* barra lateral por status (cores exclusivas, sólidas) */
+.list-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  border-radius: 2px;
+  background: var(--line); /* fallback */
+}
+.list-item[data-status="Em espera"]::before {
+  background: var(--lst-espera);
+}
+.list-item[data-status="Em atendimento"]::before {
+  background: var(--lst-andamento);
+}
+.list-item[data-status="Finalizado"]::before {
+  background: var(--lst-finalizado);
+}
+.list-item[data-status="Cancelado"]::before {
+  background: var(--lst-cancelado);
+}
+.list-item[data-status="Aberto"]::before {
+  background: var(--lst-aberto);
+}
+
+.list-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  color: #334155;
+  font-size: 16px;
+  border: 1px solid var(--line);
+}
+.list-main {
+  display: grid;
+  text-decoration: none;
+  color: inherit;
+  strong {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  small {
+    color: var(--muted);
+    font-size: 12px;
+  }
+}
+.list-empty {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ======= BADGES (status) — SÓLIDAS ======= */
+.badge {
+  min-width: 96px;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid transparent;
+  color: #111827;
+  background: #ffffff;
+}
+.badge--aberto {
+  background: #e8f1ff;
+  border-color: var(--bdg-aberto);
+  color: #0f2f7a;
+}
+.badge--andamento {
+  background: #e6fbf7;
+  border-color: var(--bdg-andamento);
+  color: #065f5b;
+}
+.badge--espera {
+  background: #fff4df;
+  border-color: var(--bdg-espera);
+  color: #7a4b0f;
+}
+.badge--finalizado {
+  background: #ecfdf5;
+  border-color: var(--bdg-finalizado);
+  color: #0e5c3a;
+}
+.badge--cancelado {
+  background: #fef2f2;
+  border-color: var(--bdg-cancelado);
+  color: #7f1d1d;
+}
+.badge--default {
+  background: #f3f4f6;
+  border-color: var(--bdg-default);
+  color: #374151;
+}
+
+/* badges auxiliares */
+.badge--rating {
+  background: #fff7db;
+  border-color: #eab308;
+  color: #7a5d00;
+}
+.badge--medal {
+  background: #eefce8;
+  border-color: #84cc16;
+  color: #214d12;
+}
+.badge--neutral {
+  background: #f4f5f7;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+/* ======= MEDALHAS (ranking) — SÓLIDAS ======= */
+.medal {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+.medal.gold {
+  background: var(--medal-gold);
+  border-color: #fcd34d;
+}
+.medal.silver {
+  background: var(--medal-silver);
+  border-color: #d1d5db;
+}
+.medal.bronze {
+  background: var(--medal-bronze);
+  border-color: #f59e0b;
+}
+
+/* ======= RESPONSIVO ======= */
+@media (max-width: 560px) {
+  .dashboard-fancy {
+    padding: 18px;
+  }
+  .kpi-value {
+    font-size: 26px;
+  }
+  .kpi-icon {
+    width: 56px;
+    height: 56px;
+  }
+}

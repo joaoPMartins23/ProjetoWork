@@ -1,0 +1,143 @@
+<section class="novo-chamado-wrapper">
+  <div *ngIf="carregando" class="area-carregando" role="status" aria-live="polite" aria-busy="true">
+    <div class="spinner" aria-label="Carregando"></div>
+  </div>
+
+  <form [formGroup]="formRecorrente" class="novo-chamado-form" *ngIf="!carregando && dados">
+    <div class="lado-esquerdo">
+      <div class="btnVoltar">
+        <i class="fa fa-arrow-left" (click)="voltarPaginaAnterior()" aria-label="Voltar"></i>
+      </div>
+
+      <div class="campo">
+        <label>Solicitante</label>
+        <ng-select class="cutom" [clearable]="false" formControlName="UsuarioCriacaoID">
+          <ng-option *ngFor="let u of usuarios" [value]="u.UsuarioID">{{ u.Nome }}</ng-option>
+        </ng-select>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label>Departamento Responsável</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="DepartamentoResponsavelID">
+            <ng-option *ngFor="let d of departamentos" [value]="d.DepartamentoResponsavelID">
+              {{ d.DepartamentoResponsavel }}
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label>Responsável</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="UsuarioResponsavelID">
+            <ng-option *ngFor="let u of usuariosTecnicos" [value]="u.UsuarioID">{{ u.Nome }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo" *ngIf="formRecorrente.get('DepartamentoResponsavelID')?.value === depPredioId">
+          <label>Bloco</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="BlocoID">
+            <ng-option *ngFor="let b of blocos" [value]="b.BlocoID">{{ b.Bloco }}</ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label>Prioridade</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="Prioridade">
+            <ng-option *ngFor="let p of prioridades" [value]="p.valor">{{ p.nome }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label>Serviço</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="ServicoID">
+            <ng-option *ngFor="let s of servicos" [value]="s.ServicoID">{{ s.Servico }}</ng-option>
+          </ng-select>
+        </div>
+
+        <div class="campo">
+          <label>Tipo de Serviço</label>
+          <ng-select class="cutom" [clearable]="false" formControlName="TipoServicoID">
+            <ng-option *ngFor="let t of tiposServico" [value]="t.TipoServicoID">{{ t.TipoServico }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn primary" (click)="alternarAtivo()" aria-label="Ativar ou Desativar">
+          <i class="fa" [ngClass]="dados.Ativo ? 'fa-pause' : 'fa-play'"></i>
+          {{ dados.Ativo ? 'Desativar' : 'Ativar' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="lado-direito">
+      <div class="campo">
+        <h2>{{ formRecorrente.get('Titulo')?.value }}</h2>
+        <p>Recorrência criada por {{ nomes.solicitante }} sendo iniciado em {{ formatarDataHora(dados.DataInicio) }}</p>
+
+        <div class="status-badge" [class.ativo]="dados.Ativo" [class.inativo]="!dados.Ativo" aria-live="polite">
+          <i class="fa" [ngClass]="dados.Ativo ? 'fa-check' : 'fa-times'"></i>
+          {{ dados.Ativo ? 'Ativo' : 'Inativo' }}
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>Frequência - Período</label>
+        <div>
+          <strong>{{ dados.Frequencia }}</strong>
+          <span *ngIf="dados.Periodo">&nbsp;•&nbsp;{{ dados.Periodo }}</span>
+        </div>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label>Início</label>
+          <input type="text" [value]="formatarDataHora(dados.DataInicio)" disabled />
+        </div>
+        <div class="campo">
+          <label>Fim</label>
+          <input type="text" [value]="dados.DataFim ? formatarDataHora(dados.DataFim) : '—'" disabled />
+        </div>
+      </div>
+
+      <div class="grupo-linha">
+        <div class="campo">
+          <label>Dias da semana</label>
+          <input type="text" [value]="diasSemanaTexto(dados)" disabled />
+        </div>
+
+        <div class="campo">
+          <label>Dia do mês</label>
+          <input type="text" [value]="dados.DiaDoMes || '—'" disabled />
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>Mês do ano</label>
+        <input type="text" [value]="dados.MesDoAno || '—'" disabled />
+      </div>
+
+      <div class="campo">
+        <label>Próximas ocorrências ({{ proximasOcorrencias.length }})</label>
+        <div class="cards-ocorrencias" *ngIf="proximasOcorrencias.length; else semOcorrenciasTpl">
+          <div class="oc-card" *ngFor="let d of proximasOcorrencias">
+            <i class="fa fa-calendar"></i>
+            <span>{{ formatarDataHora(d) }}</span>
+          </div>
+        </div>
+        <ng-template #semOcorrenciasTpl>
+          <p class="muted">Nenhuma ocorrência futura dentro do período definido.</p>
+        </ng-template>
+      </div>
+
+      <div class="campo">
+        <label>Mensagem</label>
+        <textarea [value]="dados.Mensagem === null || dados.Mensagem === undefined ? 'Nenhuma mensagem adicionada.': dados.Mensagem" readonly></textarea>
+      </div>
+    </div>
+  </form>
+</section>

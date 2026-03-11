@@ -1,0 +1,177 @@
+.tela-recuperacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-image: url("/assets/images/pages/login/fabrica.JPEG");
+  background-size: cover;
+  background-position: center;
+  padding: 2rem;
+
+  .area-formulario {
+    width: 100%;
+    max-width: 500px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+
+    .logo {
+      text-align: center;
+      margin-bottom: 1rem;
+
+      img {
+        max-width: 70px;
+      }
+    }
+
+    .cabecalho {
+      text-align: center;
+      margin-bottom: 2rem;
+
+      h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        color: #222;
+      }
+
+      p {
+        font-size: 0.95rem;
+        color: #666;
+      }
+    }
+
+    form,
+    .mensagem-sucesso {
+      width: 100%;
+
+      .grupo-campo {
+        margin-bottom: 1.2rem;
+
+        label {
+          display: block;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+        }
+
+        input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ccc;
+          border-radius: 12px;
+          font-size: 1rem;
+
+          &.campo-invalido {
+            border-color: #d93025;
+          }
+        }
+
+        .erro-label {
+          color: #d93025;
+          font-weight: 600;
+        }
+
+        .input-container {
+          position: relative;
+
+          input {
+            padding-right: 2.5rem;
+          }
+
+          .botao-olho {
+            width: 10px;
+            position: absolute;
+            top: 50%;
+            left: 87.5%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+
+            i {
+              font-size: 1.1rem;
+              color: #666;
+              opacity: 0.7;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #218838;
+        }
+      }
+    }
+
+    .mensagem-sucesso {
+      text-align: center;
+
+      h3 {
+        font-size: 1.3rem;
+        color: #28a745;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        font-size: 0.95rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+      }
+    }
+  }
+
+  // Ajustes para telas maiores
+  @media (min-width: 768px) {
+    .area-formulario {
+      padding: 2.5rem 3rem;
+
+      .logo img {
+        max-width: 80px;
+      }
+
+      .cabecalho h1 {
+        font-size: 1.8rem;
+      }
+
+      .cabecalho p {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+.avisoToken {
+  position: absolute;
+  top: 50px;
+  right: 15px;
+  background-color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 5px 4px 12px rgba(0, 0, 0, 0.757);
+  border-left: 10px solid red;
+
+  p {
+    margin: 0;
+    padding: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+}

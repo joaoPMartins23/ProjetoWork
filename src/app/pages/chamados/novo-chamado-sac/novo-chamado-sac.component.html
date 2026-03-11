@@ -1,0 +1,382 @@
+<section class="novo-chamado-wrapper">
+    <div *ngIf="carregando" class="area-carregando">
+        <div class="spinner"></div>
+    </div>
+
+    <form [formGroup]="formularioChamado" (ngSubmit)="onSubmit()" #formDir="ngForm" class="novo-chamado-form"
+        *ngIf="!carregando">
+        <div class="lado-esquerdo">
+            <h2>Novo Chamado de SAC</h2>
+
+            <div class="campo" *ngIf="perfilAcessoUsuario != 'Usuário'">
+                <label id="label_solicitante">
+                    Solicitante
+                    <span *ngIf="formularioChamado.get('UsuarioCriacaoID')?.value == ''"
+                        (click)="meAtribuirComoSolicitante()">
+                        Sou o solicitante
+                    </span>
+                </label>
+
+                <ng-select class="cutom" [clearable]="false" formControlName="UsuarioCriacaoID">
+                    <ng-option *ngFor="let usuario of usuarios" [value]="usuario.UsuarioID">
+                        {{ usuario.Nome }}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label [style.color]="
+              formularioChamado.get('DepartamentoResponsavelID')?.invalid && formDir.submitted ? 'red' : '#555'
+            ">
+                        Departamento Responsável
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="DepartamentoResponsavelID"
+                        (change)="formularioChamado.get('UsuarioResponsavelID')?.setValue('')">
+                        <ng-option *ngFor="let departamento of departamentosResponsaveis"
+                            [value]="departamento.DepartamentoResponsavelID">
+                            {{ departamento.DepartamentoResponsavel }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo" *ngIf="perfilAcessoUsuario != 'Usuário'">
+                    <label>Responsável</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="UsuarioResponsavelID">
+                        <ng-option *ngFor="let usuario of usuariosTecnicosPorDepartamento" [value]="usuario.UsuarioID">
+                            {{ usuario.Nome }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('ServicoID')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Serviço
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="ServicoID"
+                        (change)="formularioChamado.get('TipoServicoID')?.setValue('')">
+                        <ng-option *ngFor="let servico of servicosPorDepartamento" [value]="servico.ServicoID">
+                            {{ servico.Servico }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('TipoServicoID')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Tipo de Serviço
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="TipoServicoID">
+                        <ng-option *ngFor="let tipoServico of tiposServico" [value]="tipoServico.TipoServicoID">
+                            {{ tipoServico.TipoServico }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo"
+                    *ngIf="formularioChamado.get('DepartamentoResponsavelID')?.value == '17069ABC-9CE0-4E60-B119-79E20B05E6B0'">
+                    <label
+                        [style.color]="formularioChamado.get('BlocoID')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Bloco
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="BlocoID">
+                        <ng-option *ngFor="let bloco of blocos" [value]="bloco.BlocoID">
+                            {{ bloco.Bloco }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('Prioridade')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Prioridade
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="Prioridade">
+                        <ng-option *ngFor="let prioridade of prioridades" [value]="prioridade.valor">
+                            {{ prioridade.nome }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('FormaContatoID')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Forma de contato
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="FormaContatoID"
+                        placeholder="Selecione...">
+                        <ng-option *ngFor="let fc of formasContato" [value]="fc.FormaContatoID">
+                            {{ fc.FormaContato }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label
+                    [style.color]="formularioChamado.get('ClienteID')?.invalid && formDir.submitted ? 'red' : '#555'">
+                    Cliente
+                </label>
+
+                <ng-select class="cutom" [clearable]="false" formControlName="ClienteID" placeholder="Selecione...">
+                    <ng-option *ngFor="let cli of clientes" [value]="cli.ClienteID">
+                        {{ cli.RazaoSocial || cli.NomeFantasia || cli.NomeCliente }}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="campo">
+                <label [style.color]="formularioChamado.get('Produto')?.invalid && formDir.submitted ? 'red' : '#555'">
+                    Produto
+                </label>
+
+                <ng-select class="cutom" [clearable]="false" formControlName="Produto" placeholder="Selecione...">
+                    <ng-option *ngFor="let p of produtos" [value]="p.ProdutoDescricao">
+                        {{ p.ProdutoDescricao }}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('Quantidade')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Quantidade
+                    </label>
+                    <input type="number" formControlName="Quantidade" placeholder="Ex.: 12" />
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('EstadoProduto')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Estado do Produto
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="EstadoProduto"
+                        placeholder="Selecione...">
+                        <ng-option value="Lacrado">Lacrado</ng-option>
+                        <ng-option value="Aberto">Aberto</ng-option>
+                        <ng-option value="S/ prod. e S/ emb">S/ prod. e S/ emb</ng-option>
+                        <ng-option value="C/ emb. vazia">C/ emb. vazia</ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('CategoriaID')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Categoria
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="CategoriaID"
+                        placeholder="Selecione...">
+                        <ng-option *ngFor="let c of categorias" [value]="c.CategoriaID">
+                            {{ c.Categoria }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label [style.color]="formularioChamado.get('Lote')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Lote
+                    </label>
+                    <input type="text" formControlName="Lote" placeholder="Ex.: 123ABC" />
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('Fabricacao')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Fabricação
+                    </label>
+                    <input type="date" formControlName="Fabricacao" />
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('Validade')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Validade
+                    </label>
+                    <input type="date" formControlName="Validade" />
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('HoraEnvase')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Hora do envase
+                    </label>
+                    <input type="time" step="60" formControlName="HoraEnvase" />
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('LocalCompra')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Local da Compra
+                    </label>
+                    <input type="text" formControlName="LocalCompra" placeholder="Ex.: Atacadão" />
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>Cc</label>
+                <ng-select [multiple]="true" placeholder="Selecione pessoa em cópia..." formControlName="AuxiliaresIDs">
+                    <ng-option *ngFor="let usuario of usuarios" [value]="usuario.UsuarioID">
+                        {{ usuario.Nome }}
+                    </ng-option>
+                </ng-select>
+            </div>
+        </div>
+
+        <div class="lado-direito">
+            <div class="campo">
+                <label [style.color]="formularioChamado.get('Titulo')?.invalid && formDir.submitted ? 'red' : '#555'">
+                    Assunto
+                </label>
+                <input type="text" formControlName="Titulo" placeholder="Digite o assunto do chamado" />
+            </div>
+
+            <div class="campo">
+                <label [style.color]="formularioChamado.get('Mensagem')?.invalid && formDir.submitted ? 'red' : '#555'">
+                    Mensagem
+                </label>
+                <textarea formControlName="Mensagem" placeholder="Descreva o problema ou solicitação..."
+                    (paste)="onPasteEditor($event)" (dragover)="onDragOver($event)"
+                    (drop)="onDropFiles($event)"></textarea>
+            </div>
+
+            <div class="campo campo-anexos">
+                <div class="label-com-botao">
+                    <label>Anexos</label>
+                    <button class="botao-add" (click)="inputArquivo.click()" type="button">
+                        <i class="fa fa-paperclip"></i>
+                    </button>
+                </div>
+
+                <input type="file" #inputArquivo hidden multiple (change)="onFileSelected($event)" />
+
+                <div class="cards-anexos">
+                    <div class="card-anexo" *ngFor="let arquivo of arquivosSelecionados; let i = index">
+                        <div class="header-card">
+                            <button class="fechar" (click)="removerArquivo(i)" type="button">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="conteudo-card">
+                            <img *ngIf="isImage(arquivo.tipo)" [src]="arquivo.base64" class="thumb clickable"
+                                (click)="abrirPreviewDeArquivo(arquivo)" />
+
+                            <div *ngIf="!isImage(arquivo.tipo) && isVideoMime(arquivo.tipo)" class="midia clickable"
+                                (click)="abrirPreviewDeArquivo(arquivo)">
+                                <i class="fa fa-play-circle fa-3x"></i>
+                                <small>Reproduzir vídeo</small>
+                            </div>
+
+                            <div *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && isAudioMime(arquivo.tipo)"
+                                class="midia clickable" (click)="abrirPreviewDeArquivo(arquivo)">
+                                <i class="fa fa-music fa-3x"></i>
+                                <small>Reproduzir áudio</small>
+                            </div>
+
+                            <div *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && !isAudioMime(arquivo.tipo) && isPdfMime(arquivo.tipo)"
+                                class="midia clickable" (click)="abrirPreviewDeArquivo(arquivo)">
+                                <i class="fa fa-file-pdf fa-3x"></i>
+                                <small>Visualizar PDF</small>
+                            </div>
+
+                            <div *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && !isAudioMime(arquivo.tipo) && !isPdfMime(arquivo.tipo) && isExcelMime(arquivo.tipo)"
+                                class="midia clickable" (click)="abrirPreviewDeArquivo(arquivo)">
+                                <i class="fa fa-file-excel fa-3x"></i>
+                                <small>Visualizar Excel</small>
+                            </div>
+
+                            <i *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && !isAudioMime(arquivo.tipo) && !isPdfMime(arquivo.tipo) && !isExcelMime(arquivo.tipo)"
+                                class="fa fa-file fa-3x"></i>
+                        </div>
+
+                        <p class="nome-arquivo">{{ arquivo.nome }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="botoes">
+                <button type="submit">Salvar Chamado</button>
+            </div>
+        </div>
+    </form>
+</section>
+
+<div class="preview-overlay" *ngIf="preview.aberto" (click)="fecharPreview()">
+    <div class="preview-dialog" (click)="$event.stopPropagation()">
+        <button class="preview-close" (click)="fecharPreview()" aria-label="Fechar">✕</button>
+
+        <div class="preview-body">
+            <div class="preview-body" #bodyRef>
+                <img *ngIf="preview.tipo === 'image'" #imgRef class="preview-media zoomable" [class.zoomed]="zoomed"
+                    [style.transform-origin]="transformOrigin" [src]="preview.src" (error)="onPreviewRenderError()"
+                    (click)="toggleZoomAtClick($event, imgRef, bodyRef)" />
+            </div>
+
+            <video *ngIf="preview.tipo === 'video'" class="preview-media" [src]="preview.src" controls></video>
+
+            <audio *ngIf="preview.tipo === 'audio'" style="width: 100%; padding: 16px" [src]="preview.src"
+                controls></audio>
+
+            <iframe *ngIf="preview.tipo === 'pdf'" class="preview-pdf" [src]="getPdfSafeUrl()"
+                title="Visualização de PDF"></iframe>
+
+            <div *ngIf="preview.tipo === 'excel' && preview.excel" class="excel-viewer">
+                <div class="excel-tabs">
+                    <button *ngFor="let s of preview.excel.sheets; let i = index" type="button"
+                        [class.active]="i === preview.excel.activeIndex" (click)="preview.excel!.activeIndex = i">
+                        {{ s.name }}
+                    </button>
+                </div>
+
+                <div class="excel-table-wrap">
+                    <table class="excel-table">
+                        <tbody>
+                            <tr *ngFor="let row of preview.excel.sheets[preview.excel.activeIndex].rows">
+                                <td *ngFor="let cell of row">{{ cell }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="telefone-modal-overlay" *ngIf="showPhoneGuard">
+    <section class="telefone-modal" role="dialog" aria-modal="true" aria-labelledby="telTitulo">
+        <header class="telefone-modal__header">
+            <h3 id="telTitulo">Adicione seu telefone</h3>
+            <button type="button" class="btn-fechar" (click)="cancelarCadastroTelefone()" aria-label="Fechar">✕</button>
+        </header>
+
+        <div class="telefone-modal__body">
+            <p>Você precisa cadastrar um telefone para abrir chamados.</p>
+            <small>Isso permite receber avisos e facilitar nosso contato.</small>
+        </div>
+
+        <footer class="telefone-modal__footer">
+            <button type="button" class="btn outline" (click)="cancelarCadastroTelefone()">Cancelar</button>
+            <button type="button" class="btn primary" (click)="confirmarCadastroTelefone()">Cadastrar agora</button>
+        </footer>
+    </section>
+</div>

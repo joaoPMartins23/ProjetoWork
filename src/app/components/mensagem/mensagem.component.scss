@@ -1,0 +1,55 @@
+.caixaMensagem {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  animation: aparecerMensagem 0.4s ease-out forwards;
+
+  .mensagem {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-left: 5px solid #00a74a;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 0.75rem 1rem;
+    min-width: 250px;
+    max-width: 350px;
+
+    .cabecalho {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      span {
+        font-size: 0.95rem;
+        font-weight: 500;
+        flex: 1;
+        margin-right: 1rem;
+        word-break: break-word;
+      }
+
+      .botaoFecharMensagem {
+        font-size: 1.1rem;
+        color: #888;
+        cursor: pointer;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #333;
+        }
+      }
+    }
+  }
+}
+
+@keyframes aparecerMensagem {
+  from {
+    opacity: 0;
+    transform: translateX(50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

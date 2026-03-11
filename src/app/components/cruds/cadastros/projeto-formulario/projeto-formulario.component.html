@@ -1,0 +1,52 @@
+<section>
+  <form [formGroup]="formularioProjeto" (ngSubmit)="onSubmit()" class="formulario-usuario" #formDir="ngForm">
+    <div>
+      <div class="cabecalhoFormulario">
+        <h2>
+          <i class="fa fa-arrow-left" routerLink="/Projetos"></i>
+          {{ urlAtual.length == 2? 'Criar': 'Editar' }} Projeto
+        </h2>
+
+        <i class="fa fa-times" routerLink="/Projetos"></i>
+      </div>
+
+      <div *ngIf="carregando" class="area-carregando">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="form-linha linha-unica" *ngIf="!carregando">
+        <label
+          [style.color]="formularioProjeto.get('Projeto')?.invalid && formDir.submitted? 'red': '#000'">Projeto</label>
+        <input type="text" formControlName="Projeto"
+          placeholder="{{formularioProjeto.get('Projeto')?.invalid && formDir.submitted? 'Obrigatório': ''}}" />
+      </div>
+
+      <div class="form-linha" *ngIf="!carregando">
+        <div *ngIf="departamentoResponsavel === '58D91F39-BD92-40D0-BFC1-D6C8D7103ABD'">
+          <label [style.color]="formularioProjeto.get('Tipo')?.invalid && formDir.submitted? 'red': '#000'">Tipo</label>
+          <ng-select class="cutom" formControlName="Tipo" placeholder="Selecione">
+            <ng-option value="Desenvolvimento">Desenvolvimento</ng-option>
+            <ng-option value="Infraestrutura">Infraestrutura</ng-option>
+            <ng-option value="Dados">Dados</ng-option>
+            <ng-option value="Monitoramento">Monitoramento</ng-option>
+          </ng-select>
+        </div>
+
+        <div>
+          <label
+            [style.color]="formularioProjeto.get('DepartamentoResponsavelID')?.invalid && formDir.submitted? 'red': '#000'">Departamento</label>
+          <ng-select class="cutom" [items]="departamentos" bindLabel="DepartamentoResponsavel"
+            bindValue="DepartamentoResponsavelID" formControlName="DepartamentoResponsavelID" placeholder="Selecione">
+          </ng-select>
+        </div>
+      </div>
+    </div>
+
+    <div class="botoesFormulario" *ngIf="!carregando">
+      <button type="submit" class="btn-salvar">
+        <i class="fa fa-save"></i>
+        Salvar
+      </button>
+    </div>
+  </form>
+</section>

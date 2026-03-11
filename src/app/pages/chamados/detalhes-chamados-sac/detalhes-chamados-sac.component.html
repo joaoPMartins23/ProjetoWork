@@ -1,0 +1,717 @@
+<section class="novo-chamado-wrapper">
+    <div *ngIf="carregando" class="area-carregando" role="status" aria-live="polite" aria-busy="true">
+        <div class="spinner" aria-label="Carregando"></div>
+    </div>
+
+    <form [formGroup]="formularioChamado" #formDir="ngForm" class="novo-chamado-form" *ngIf="!carregando">
+        <div class="lado-esquerdo">
+            <div class="btnVoltar">
+                <i class="fa fa-arrow-left" (click)="voltarPaginaAnterior()"></i>
+
+                <p>{{ chamadoAtual.Protocolo }}</p>
+            </div>
+
+            <div class="campo">
+                <label>Solicitante</label>
+                <ng-select class="cutom" [clearable]="false" formControlName="UsuarioCriacaoID"
+                    (change)="alterarSolicitanteChamado()">
+                    <ng-option *ngFor="let usuario of usuarios" [value]="usuario.UsuarioID">
+                        {{usuario.Nome}}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('DepartamentoResponsavelID')?.invalid && formDir.submitted? 'red': '#555'">Departamento
+                        Responsável</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="DepartamentoResponsavelID"
+                        (change)="alterarDepartamentoResponsavelChamado()">
+                        <ng-option *ngFor="let departamento of departamentosResponsaveis"
+                            [value]="departamento.DepartamentoResponsavelID">
+                            {{departamento.DepartamentoResponsavel}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label>Responsável</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="UsuarioResponsavelID"
+                        (change)="alterarResponsavelChamado()">
+                        <ng-option *ngFor="let usuario of usuariosTecnicosPorDepartamento" [value]="usuario.UsuarioID">
+                            {{usuario.Nome}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('ServicoID')?.invalid && formDir.submitted? 'red': '#555'">Serviço</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="ServicoID"
+                        (change)="alterarServicoChamado()">
+                        <ng-option *ngFor="let servico of servicosPorDepartamento" [value]="servico.ServicoID"
+                            [disabled]="(servico.Servico || '').trim().toLowerCase() === 'comum'
+                       && servico.ServicoID !== formularioChamado.get('ServicoID')?.value">
+                            {{ servico.Servico }}
+                        </ng-option>
+
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('TipoServicoID')?.invalid && formDir.submitted? 'red': '#555'">Tipo
+                        de
+                        Serviço</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="TipoServicoID"
+                        (change)="atualizarChamado()">
+                        <ng-option *ngFor="let tipoServico of tiposServico" [value]="tipoServico.TipoServicoID"
+                            [disabled]="(tipoServico.TipoServico || '').trim().toLowerCase() === 'comum'
+                       && tipoServico.TipoServicoID !== formularioChamado.get('TipoServicoID')?.value">
+                            {{ tipoServico.TipoServico }}
+                        </ng-option>
+
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo"
+                    *ngIf="formularioChamado.get('DepartamentoResponsavelID')?.value == '17069ABC-9CE0-4E60-B119-79E20B05E6B0'">
+                    <label
+                        [style.color]="formularioChamado.get('BlocoID')?.invalid && formDir.submitted? 'red': '#555'">Bloco</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="BlocoID"
+                        (change)="atualizarChamado()">
+                        <ng-option *ngFor="let bloco of blocos" [value]="bloco.BlocoID">
+                            {{bloco.Bloco}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('Prioridade')?.invalid && formDir.submitted? 'red': '#555'">Prioridade</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="Prioridade"
+                        (change)="atualizarChamado()">
+                        <ng-option *ngFor="let prioridade of prioridades" [value]="prioridade.valor">
+                            {{prioridade.nome}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label>Forma de contato</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="FormaContatoID"
+                        (change)="atualizarChamado()">
+                        <ng-option *ngFor="let f of formasContato" [value]="f.FormaContatoID">
+                            {{ f.FormaContato }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>Cliente</label>
+                <ng-select class="cutom" [clearable]="false" formControlName="ClienteID" (change)="atualizarChamado()">
+                    <ng-option *ngFor="let cli of clientes" [value]="cli.ClienteID">
+                        {{ cli.RazaoSocial || cli.NomeFantasia || cli.NomeCliente }}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="campo">
+                <label>Produto</label>
+                <ng-select class="cutom" [clearable]="false" formControlName="Produto" (change)="atualizarChamado()">
+                    <ng-option *ngFor="let p of produtos" [value]="p.ProdutoDescricao">
+                        {{ p.ProdutoDescricao }}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('Quantidade')?.invalid && formDir.submitted ? 'red' : '#555'"
+                        (input)="atualizarChamadoDebounced()">
+                        Quantidade
+                    </label>
+                    <input type="number" formControlName="Quantidade" placeholder="Ex.: 12" />
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('EstadoProduto')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Estado do Produto
+                    </label>
+
+                    <ng-select class="cutom" [clearable]="false" formControlName="EstadoProduto"
+                        placeholder="Selecione..." (change)="atualizarChamado()">
+                        <ng-option value="Lacrado">Lacrado</ng-option>
+                        <ng-option value="Aberto">Aberto</ng-option>
+                        <ng-option value="S/ prod. e S/ emb">S/ prod. e S/ emb</ng-option>
+                        <ng-option value="C/ emb. vazia">C/ emb. vazia</ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label>Categoria</label>
+                    <ng-select class="cutom" [clearable]="false" formControlName="CategoriaID"
+                        (change)="atualizarChamado()">
+                        <ng-option *ngFor="let c of categorias" [value]="c.CategoriaID">
+                            {{ c.Categoria }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="campo">
+                    <label>Lote</label>
+                    <input type="text" formControlName="Lote" (input)="atualizarChamadoDebounced()" />
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label>Fabricação</label>
+                    <input type="date" formControlName="Fabricacao" (change)="atualizarChamado()" />
+                </div>
+
+                <div class="campo">
+                    <label>Validade</label>
+                    <input type="date" formControlName="Validade" (change)="atualizarChamado()" />
+                </div>
+            </div>
+
+            <div class="grupo-linha">
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('HoraEnvase')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Hora do envase
+                    </label>
+                    <input type="time" step="60" formControlName="HoraEnvase" (change)="atualizarChamado()" />
+                </div>
+
+                <div class="campo">
+                    <label
+                        [style.color]="formularioChamado.get('LocalCompra')?.invalid && formDir.submitted ? 'red' : '#555'">
+                        Local da Compra
+                    </label>
+                    <input type="text" formControlName="LocalCompra" placeholder="Ex.: Atacadão"
+                        (input)="atualizarChamadoDebounced()" />
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>Cc</label>
+                <ng-select [multiple]="true" [clearable]="false" placeholder="Selecione pessoa em cópia..."
+                    formControlName="AuxiliaresIDs" (change)="adicionarRemoverAuxiliar()">
+                    <ng-option *ngFor="let usuario of usuarios" [value]="usuario.UsuarioID">
+                        {{usuario.Nome}}
+                    </ng-option>
+                </ng-select>
+            </div>
+
+            <div class="actions" *ngIf="chamadoAtual.Status !== 'Finalizado' && chamadoAtual.Status !== 'Cancelado'">
+                <button type="button" class="btn primary" (click)="atribuirChamadoEmAtendimento()"
+                    *ngIf="formularioChamado.get('Status')?.value != 'Em atendimento' && formularioChamado.get('UsuarioResponsavelID')?.value != '' && usuarioID == formularioChamado.get('UsuarioResponsavelID')?.value && !statusAlterado"
+                    aria-label="Iniciar atendimento">
+                    <i class="fa fa-play" aria-hidden="true"></i>
+                    <span>Iniciar atendimento</span>
+                </button>
+
+                <button type="button" class="btn outline" *ngIf="!formularioChamado.get('UsuarioResponsavelID')?.value
+           && !chamadoAtual.UsuarioResponsavelID
+           && perfilAcessoUsuario !== 'Usuário'
+           && departamentoResponsavel === chamadoAtual.DepartamentoResponsavelID" (click)="atribuirChamadoUsuario()"
+                    aria-label="Atribuir chamado para mim">
+                    <i class="fa fa-user-plus" aria-hidden="true"></i>
+                    <span>Atribuir para mim</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="lado-direito">
+            <div class="resumo-chamado-card">
+                <header class="resumo-head">
+                    <h2 class="titulo">{{ formularioChamado.get('Titulo')?.value }}</h2>
+
+                    <div class="resumo-head-actions">
+                        <span class="chip" [ngClass]="{
+      'chip--ok': chamadoAtual.Status === 'Finalizado',
+      'chip--warn': chamadoAtual.Status === 'Em espera' || chamadoAtual.Status === 'Aguardando solicitante' || chamadoAtual.Status === 'Aguardando responsável' || chamadoAtual.Status === 'Aguardando parceiro',
+      'chip--info': chamadoAtual.Status === 'Em atendimento',
+      'chip--muted': chamadoAtual.Status === 'Cancelado'}">
+                            <i class="fa fa-circle"></i> {{ chamadoAtual.Status }}
+                        </span>
+
+                        <button type="button" class="btn btn-pdf" (click)="baixarRelatorioPdf()">
+                            <i class="fa fa-file-pdf"></i>
+                            <span>Baixar PDF</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="resumo-grid">
+                    <div class="info-row">
+                        <i class="fa fa-user"></i>
+                        <div>
+                            <div class="info-label">Aberto por</div>
+                            <div class="info-value">{{ nomeUsuarioCriacao }}</div>
+                            <div class="info-sub">{{ formatarDataHora(chamadoAtual.DataHora) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row" *ngIf="chamadoAtual.DataHoraFinalizacao !== '0001-01-01T00:00:00'">
+                        <i class="fa fa-check-circle"></i>
+                        <div>
+                            <div class="info-label">Finalizado por</div>
+                            <div class="info-value">{{ nomeUsuarioFinalizacao }}</div>
+                            <div class="info-sub">{{ formatarDataHora(chamadoAtual.DataHoraFinalizacao) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="resumo-grid">
+                    <div class="info-row" *ngIf="clienteSelecionado">
+                        <i class="fa fa-id-card"></i>
+                        <div>
+                            <div class="info-label">Informações do Cliente</div>
+
+                            <div class="info-value">
+                                {{ (clienteSelecionado.NomeFantasia || clienteSelecionado.RazaoSocial ||
+                                clienteSelecionado.NomeCliente || 'Não Informado').trim() }}
+                            </div>
+
+                            <div class="info-sub">
+                                CNPJ: {{ (clienteSelecionado.Cnpj || '').trim() || 'Não Informado' }}
+                            </div>
+
+                            <div class="info-sub">
+                                Telefone: {{ formatTelefoneBR(clienteSelecionado.Telefone ?? undefined) || 'Não
+                                Informado' }}
+                            </div>
+
+                            <div class="info-sub">
+                                Endereço: {{ enderecoCliente(clienteSelecionado) || 'Não Informado' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="projeto-bloco" *ngIf="formularioChamado.get('ProjetoID')?.value">
+                    <div class="projeto-head">
+                        <i class="fa fa-briefcase"></i>
+                        <h3>Tarefa</h3>
+                    </div>
+
+                    <dl class="projeto-dl">
+                        <div class="dl-row">
+                            <dt><i class="fa fa-play"></i> Início</dt>
+                            <dd>{{ formatarDataHora(formularioChamado.get('DataHoraInicioProjeto')?.value) || '—' }}
+                            </dd>
+                        </div>
+                        <div class="dl-row">
+                            <dt><i class="fa fa-hourglass-half"></i> Estimado</dt>
+                            <dd>{{ formularioChamado.get('DataHoraEstimado')?.value !== null?
+                                formatarDataHora(formularioChamado.get('DataHoraEstimado')?.value):
+                                '-------------------' }}</dd>
+                        </div>
+                        <div class="dl-row" *ngIf="chamadoAtual.DataHoraFinalizacaoProjeto != null">
+                            <dt><i class="fa fa-flag-checkered"></i> Finalização</dt>
+                            <dd>{{ formatarDataHora(formularioChamado.get('DataHoraFinalizacaoProjeto')?.value) || '—'
+                                }}</dd>
+                        </div>
+                    </dl>
+
+                    <ng-container *ngIf="projetoTempo() as pt">
+                        <div class="projeto-metrics">
+                            <div class="metric">
+                                <div class="metric-label">Duração útil</div>
+                                <div class="metric-value">{{ pt.duracaoFmt || '—' }}</div>
+                            </div>
+
+                            <div class="metric" *ngIf="pt.temEstimado">
+                                <div class="metric-label">Status do prazo</div>
+                                <div class="metric-value">
+                                    <span class="chip" [ngClass]="pt.passou ? 'chip--danger' : 'chip--ok'">
+                                        <i class="fa"
+                                            [ngClass]="pt.passou ? 'fa-exclamation-triangle' : 'fa-check'"></i>
+                                        {{ pt.passou ? ('Atrasado ' + (pt.atrasoFmt || '')) : 'Dentro do estimado' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="divider"
+                    *ngIf="(chamadoAtual.Status == 'Finalizado' && usuarioID == chamadoAtual.UsuarioCriacaoID) || (chamadoAtual.PesquisaSatisfacao != null && (usuarioID == chamadoAtual.UsuarioCriacaoID || usuarioID == chamadoAtual.UsuarioResponsavelID)) ">
+                </div>
+
+                <footer class="resumo-actions"
+                    *ngIf="chamadoAtual.Status === 'Finalizado' || chamadoAtual.Status === 'Cancelado'">
+                    <button class="btn btn-outline" type="button" (click)="reabrirChamado()">
+                        <i class="fa fa-history"></i>
+                        Reabrir chamado
+                    </button>
+                </footer>
+
+
+                <div class="campo" *ngIf="chamadoAtual.Status !== 'Finalizado' && chamadoAtual.Status !== 'Cancelado'">
+                    <label
+                        [style.color]="formularioChamado.get('Mensagem')?.invalid && formDir.submitted? 'red': '#555'">
+                        Mensagem {{formularioChamado.get('Mensagem')?.value.length > 2000 && formDir.submitted? 'precisa
+                        conter no máximo 2000 caracteres!': ''}}
+                    </label>
+                    <textarea formControlName="Mensagem" placeholder="Descreva o problema ou solicitação..."
+                        (paste)="onPasteEditor($event)" (dragover)="onDragOver($event)"
+                        (drop)="onDropFiles($event)"></textarea>
+                </div>
+
+                <div class="campo campo-anexos"
+                    *ngIf="chamadoAtual.Status !== 'Finalizado' && chamadoAtual.Status !== 'Cancelado'">
+                    <div class="label-com-botao">
+                        <label>Anexos</label>
+                        <button class="botao-add" (click)="inputArquivo.click()" type="button">
+                            <i class="fa fa-paperclip"></i>
+                        </button>
+                    </div>
+
+                    <input type="file" #inputArquivo hidden multiple (change)="onFileSelected($event)" />
+
+                    <div class="cards-anexos">
+                        <div class="card-anexo" *ngFor="let arquivo of arquivosSelecionados; let i = index">
+                            <div class="header-card">
+                                <button class="fechar" (click)="removerArquivo(i)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+
+                            <div class="conteudo-card">
+                                <img *ngIf="isImage(arquivo.tipo)" [src]="arquivo.base64" class="thumb clickable"
+                                    (click)="abrirPreviewDeArquivo(arquivo)" />
+
+                                <div *ngIf="!isImage(arquivo.tipo) && isVideoMime(arquivo.tipo)" class="midia clickable"
+                                    (click)="abrirPreviewDeArquivo(arquivo)">
+                                    <i class="fa fa-play-circle fa-3x"></i>
+                                    <small>Reproduzir vídeo</small>
+                                </div>
+
+                                <div *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && isAudioMime(arquivo.tipo)"
+                                    class="midia clickable" (click)="abrirPreviewDeArquivo(arquivo)">
+                                    <i class="fa fa-music fa-3x"></i>
+                                    <small>Reproduzir áudio</small>
+                                </div>
+
+                                <div *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && !isAudioMime(arquivo.tipo) && isPdfMime(arquivo.tipo)"
+                                    class="midia clickable" (click)="abrirPreviewDeArquivo(arquivo)">
+                                    <i class="fa fa-file-pdf fa-3x"></i>
+                                    <small>Visualizar PDF</small>
+                                </div>
+
+                                <div *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && !isAudioMime(arquivo.tipo) && !isPdfMime(arquivo.tipo) && isExcelMime(arquivo.tipo)"
+                                    class="midia clickable" (click)="abrirPreviewDeArquivo(arquivo)">
+                                    <i class="fa fa-file-excel fa-3x"></i>
+                                    <small>Visualizar Excel</small>
+                                </div>
+
+                                <i *ngIf="!isImage(arquivo.tipo) && !isVideoMime(arquivo.tipo) && !isAudioMime(arquivo.tipo) && !isPdfMime(arquivo.tipo) && !isExcelMime(arquivo.tipo)"
+                                    class="fa fa-file fa-3x"></i>
+                            </div>
+
+                            <p class="nome-arquivo">{{ arquivo.nome }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="botaoAdicionarMensagem"
+                    *ngIf="chamadoAtual.Status !== 'Finalizado' && chamadoAtual.Status !== 'Cancelado'">
+                    <div class="grupo-linha">
+                        <div class="campo">
+                            <label>Visibilidade da mensagem</label>
+
+                            <ng-select class="cutom" [clearable]="false" formControlName="MensagemInterna">
+                                <ng-option value="false">Pública</ng-option>
+                                <ng-option value="true">Interna</ng-option>
+                            </ng-select>
+                        </div>
+
+                        <div class="campo">
+                            <label
+                                [style.color]="formularioChamado.get('Status')?.invalid && formDir.submitted? 'red': '#555'">Status</label>
+                            <ng-select class="cutom" [clearable]="false" formControlName="Status"
+                                (change)="statusAlterado = true">
+                                <ng-option value="Em espera">Em espera</ng-option>
+                                <ng-option value="Aguardando solicitante">Aguardando solicitante</ng-option>
+                                <ng-option value="Aguardando responsável">Aguardando responsável</ng-option>
+                                <ng-option value="Aguardando parceiro">Aguardando parceiro</ng-option>
+                                <ng-option value="Finalizado">Finalizar</ng-option>
+                                <ng-option value="Cancelado">Cancelado</ng-option>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <button (click)="adicionarMensagem()">Adicionar Mensagem</button>
+                </div>
+
+                <div class="mensagens">
+                    <ng-container *ngFor="let item of chamadoAtual.Mensagens">
+                        <div class="mensagem" *ngIf="!item.Interno || item.UsuarioID === usuarioID"
+                            [style.border-left]="item.Interno ? '8px solid #c800c8' : '8px solid #00b000'">
+
+                            <div class="usuario">
+                                <div class="iconeUsuario" *ngIf="buscarUsuarioMensagem(item.UsuarioID) as u">
+                                    <img *ngIf="u?.Imagem?.trim(); else iconUser" [src]="u.Imagem" alt="" />
+                                    <ng-template #iconUser>
+                                        <i class="fa fa-user"></i>
+                                    </ng-template>
+                                </div>
+
+                                <div class="info">
+                                    <strong>{{ buscarUsuarioMensagem(item.UsuarioID).Nome }}</strong>
+                                    <span>{{ formatarDataHora(item.DataHoraInicio) }} às {{
+                                        formatarDataHora(item.DataHoraFim) }}</span>
+                                </div>
+
+                                <button
+                                    *ngIf="item.UsuarioID === usuarioID && (chamadoAtual.Status != 'Finalizado' && chamadoAtual.Status != 'Cancelado')"
+                                    class="btn-icone-editar" (click)="iniciarEdicao(item)" type="button">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                            </div>
+
+                            <div class="textoComentario">
+                                <ng-container *ngIf="editandoId !== item.MensagemID; else modoEdicao">
+                                    <p>{{ item.Mensagem }}</p>
+                                </ng-container>
+
+                                <ng-template #modoEdicao>
+                                    <textarea [(ngModel)]="textoEdicao" [ngModelOptions]="{ standalone: true }" rows="4"
+                                        aria-label="Editar mensagem"></textarea>
+
+                                    <div class="acoes-edicao">
+                                        <button type="button" class="btn primary" (click)="salvarEdicao(item)"
+                                            aria-label="Salvar edição">
+                                            <i class="fa fa-save"></i> Salvar
+                                        </button>
+                                        <button type="button" id="btn_cancelar_edicao" class="btn outline"
+                                            (click)="cancelarEdicao()" aria-label="Cancelar edição">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <div class="cards-anexos" *ngIf="item.Arquivos.length > 0">
+                                <div class="card-anexo" *ngFor="let anexo of item.Arquivos">
+                                    <div class="conteudo-card">
+                                        <img *ngIf="isImageView(anexo.LinkArquivo)" [src]="anexo.LinkArquivo"
+                                            class="thumb clickable" (click)="abrirPreviewDeUrl(anexo.LinkArquivo)" />
+
+                                        <div *ngIf="!isImageView(anexo.LinkArquivo) && isVideoView(anexo.LinkArquivo)"
+                                            class="midia clickable" (click)="abrirPreviewDeUrl(anexo.LinkArquivo)">
+                                            <i class="fa fa-play-circle fa-3x"></i>
+                                            <small>Reproduzir vídeo</small>
+                                        </div>
+
+                                        <div *ngIf="!isImageView(anexo.LinkArquivo) && !isVideoView(anexo.LinkArquivo) && isAudioView(anexo.LinkArquivo)"
+                                            class="midia clickable" (click)="abrirPreviewDeUrl(anexo.LinkArquivo)">
+                                            <i class="fa fa-music fa-3x"></i>
+                                            <small>Reproduzir áudio</small>
+                                        </div>
+
+                                        <div *ngIf="!isImageView(anexo.LinkArquivo) && !isVideoView(anexo.LinkArquivo) && !isAudioView(anexo.LinkArquivo) && isPdfView(anexo.LinkArquivo)"
+                                            class="midia clickable" (click)="abrirPreviewDeUrl(anexo.LinkArquivo)">
+                                            <i class="fa fa-file-pdf fa-3x"></i>
+                                            <small>Visualizar PDF</small>
+                                        </div>
+                                        <div *ngIf="!isImageView(anexo.LinkArquivo) && !isVideoView(anexo.LinkArquivo) && !isAudioView(anexo.LinkArquivo) && !isPdfView(anexo.LinkArquivo) && isExcelView(anexo.LinkArquivo)"
+                                            class="midia clickable" (click)="abrirPreviewDeUrl(anexo.LinkArquivo)">
+                                            <i class="fa fa-file-excel fa-3x"></i>
+                                            <small>Visualizar Excel</small>
+                                        </div>
+
+                                        <i *ngIf="!isImageView(anexo.LinkArquivo) && !isVideoView(anexo.LinkArquivo) && !isAudioView(anexo.LinkArquivo) && !isPdfView(anexo.LinkArquivo) && !isExcelView(anexo.LinkArquivo)"
+                                            class="fa fa-file fa-3x"></i>
+                                    </div>
+
+                                    <p class="nome-arquivo">{{ getNomeArquivo(anexo.LinkArquivo) }}</p>
+                                    <a [href]="anexo.LinkArquivo" target="_blank" download class="btn-download">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="verHistorico">
+                    <button type="button" (click)="historicoChamadoAberto = true">
+                        <i class="fa fa-history"></i>
+                        <span>Ver Histórico</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+<div class="preview-overlay" *ngIf="preview.aberto" (click)="fecharPreview()">
+    <div class="preview-dialog" (click)="$event.stopPropagation()">
+        <button class="preview-close" (click)="fecharPreview()" aria-label="Fechar">✕</button>
+
+        <div class="preview-body">
+            <div class="preview-body" #bodyRef>
+                <img *ngIf="preview.tipo === 'image'" #imgRef class="preview-media zoomable" [class.zoomed]="zoomed"
+                    [style.transform-origin]="transformOrigin" [src]="preview.src" (error)="onPreviewRenderError()"
+                    (click)="toggleZoomAtClick($event, imgRef, bodyRef)" />
+            </div>
+
+            <video *ngIf="preview.tipo === 'video'" class="preview-media" [src]="preview.src" controls></video>
+
+            <audio *ngIf="preview.tipo === 'audio'" style="width:100%; padding:16px;" [src]="preview.src"
+                controls></audio>
+
+            <iframe *ngIf="preview.tipo === 'pdf'" class="preview-pdf" [src]="getPdfSafeUrl()"
+                title="Visualização de PDF">
+            </iframe>
+
+            <div *ngIf="preview.tipo === 'excel' && preview.excel" class="excel-viewer">
+                <div class="excel-tabs">
+                    <button *ngFor="let s of preview.excel.sheets; let i = index" type="button"
+                        [class.active]="i === preview.excel.activeIndex" (click)="preview.excel!.activeIndex = i">
+                        {{ s.name }}
+                    </button>
+                </div>
+
+                <div class="excel-table-wrap">
+                    <table class="excel-table">
+                        <tbody>
+                            <tr *ngFor="let row of preview.excel.sheets[preview.excel.activeIndex].rows">
+                                <td *ngFor="let cell of row">{{ cell }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" *ngIf="overlayAssumirRespAberto">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="assumirTitulo"
+        (click)="$event.stopPropagation()">
+        <header class="modal-card__header">
+            <h3 id="assumirTitulo">Assumir responsabilidade</h3>
+        </header>
+
+        <div class="modal-card__body"
+            *ngIf="this.formularioChamado.get('Status')?.value !== 'Finalizado' && this.formularioChamado.get('Status')?.value !== 'Cancelado'">
+            <p>
+                Este chamado já possui um responsável diferente de você.
+                Deseja se atribuir como responsável <strong>antes</strong> de enviar a mensagem?
+            </p>
+
+            <div class="modal-card__note">
+                <i class="fa fa-info-circle"></i>
+                <span>
+                    Ao confirmar, o responsável será <strong>você</strong> e o status poderá ser ajustado para
+                    <strong>Em atendimento</strong>.
+                </span>
+            </div>
+        </div>
+
+        <div class="modal-card__body"
+            *ngIf="this.formularioChamado.get('Status')?.value === 'Finalizado' || this.formularioChamado.get('Status')?.value === 'Cancelado'">
+            <p>
+                Este chamado já possui um responsável diferente de você.
+                Deseja se atribuir como responsável <strong>antes</strong> de enviar a mensagem?
+            </p>
+
+            <div class="modal-card__note">
+                <i class="fa fa-info-circle"></i>
+                <span>
+                    Ao confirmar, o responsável será <strong>você</strong>.
+                </span>
+            </div>
+        </div>
+
+        <footer class="modal-card__footer">
+            <button type="button" class="btn btn-ghost" (click)="cancelarAssumir()"
+                *ngIf="this.formularioChamado.get('Status')?.value !== 'Finalizado' && this.formularioChamado.get('Status')?.value !== 'Cancelado'">Cancelar</button>
+            <button type="button" class="btn btn-ghost" (click)="cancelarAssumir()"
+                *ngIf="(this.formularioChamado.get('Status')?.value === 'Finalizado' || this.formularioChamado.get('Status')?.value === 'Cancelado') && formularioChamado.get('UsuarioResponsavelID')?.value !== ''">Cancelar</button>
+            <button type="button" class="btn btn-success" (click)="confirmarAssumir()">Atribuir para mim</button>
+        </footer>
+    </section>
+</div>
+<div class="telefone-modal-overlay" *ngIf="showPhoneGuard">
+    <section class="telefone-modal" role="dialog" aria-modal="true" aria-labelledby="telTitulo">
+        <header class="telefone-modal__header">
+            <h3 id="telTitulo">Adicione seu telefone</h3>
+            <button type="button" class="btn-fechar" (click)="cancelarCadastroTelefone()" aria-label="Fechar">✕</button>
+        </header>
+
+        <div class="telefone-modal__body">
+            <p>Você precisa cadastrar um telefone para visualizar este chamado.</p>
+            <small>Isso permite receber avisos e facilitar nosso contato.</small>
+        </div>
+
+        <footer class="telefone-modal__footer">
+            <button type="button" class="btn outline" (click)="cancelarCadastroTelefone()">Cancelar</button>
+            <button type="button" class="btn primary" (click)="confirmarCadastroTelefone()">Cadastrar agora</button>
+        </footer>
+    </section>
+</div>
+<div class="historicoChamado-overlay" *ngIf="historicoChamadoAberto" (click)="historicoChamadoAberto = false">
+    <section class="historico-card" role="dialog" aria-modal="true" aria-labelledby="histTitle"
+        (click)="$event.stopPropagation()">
+        <header class="historico-card__header">
+            <h3 id="histTitle">Histórico do chamado</h3>
+        </header>
+
+        <div class="historico-card__body" *ngIf="historicoChamado.length; else vazio">
+            <article class="historico-item" *ngFor="let h of historicoChamado; trackBy: trackByHistoricoId"
+                [attr.data-id]="h.HistoricoChamadoID">
+                <div class="historico-item__meta">
+                    <time [attr.datetime]="h.DataHora">{{ h.DataHora | date:'short' }}</time>
+                </div>
+                <p class="historico-item__texto">{{ h.Historico }}</p>
+            </article>
+        </div>
+
+        <ng-template #vazio>
+            <div class="historico-card__empty">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <p>Sem registros de histórico para este chamado.</p>
+            </div>
+        </ng-template>
+
+        <footer class="historico-card__footer">
+            <button type="button" class="btn btn-ghost" (click)="historicoChamadoAberto = false">Fechar</button>
+        </footer>
+    </section>
+</div>
+<section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="avaliacaoObrigTitulo"
+    (click)="$event.stopPropagation()">
+    <header class="modal-card__header">
+        <h3 id="avaliacaoObrigTitulo">Avalie o atendimento para finalizar</h3>
+    </header>
+
+    <div class="modal-card__body">
+        <p>Como você avalia o atendimento?</p>
+        <div class="avaliacao-estrelas">
+            <span *ngFor="let estrela of estrelas; let i = index" (mouseenter)="hoverEstrela(i + 1)"
+                (mouseleave)="hoverEstrela(0)" (click)="selecionarEstrela(i + 1)" class="estrela"
+                [ngClass]="getClasseEstrela(i + 1)">
+                <i class="fas fa-star"></i>
+            </span>
+        </div>
+
+        <small>A finalização só continua após você escolher uma nota.</small>
+    </div>
+
+    <footer class="modal-card__footer">
+        <button type="button" class="btn btn-ghost" (click)="obrigarAvaliacaoAberto = false">Cancelar</button>
+    </footer>
+</section>

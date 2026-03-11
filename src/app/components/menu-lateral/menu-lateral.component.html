@@ -1,0 +1,210 @@
+<div class="menuLateral" [style.z-index]="(isMobile && !menuFechado) ? 1001 : 999" [ngClass]="{
+    'fechado': menuFechado && !isMobile,
+    'mobile-fechado': isMobile && menuFechado,
+    'mobile-aberto': isMobile && !menuFechado
+  }" (mouseenter)="!isMobile && expandirMenu()" (mouseleave)="!isMobile && retrairMenu()">
+
+  <div class="toggleMenu" [ngClass]="{ 'toggleMenuAberto': !menuFechado }">
+    <img src="/assets/images/logos/projetoWork.png" 
+      alt="Toggle menu" [ngClass]="menuFechado ? 'logoToggle-fechado' : 'logoToggle-aberto'"
+      (click)="toggleMenuMobile()" />
+
+
+    <i class="fa" *ngIf="!menuFechado && !isMobile" [ngClass]="menuFixado ? 'fa-lock' : 'fa-lock-open'"
+      (click)="alternarFixarMenu()" title="{{ menuFixado ? 'Desfixar menu' : 'Fixar menu' }}"></i>
+
+    <i class="fa fa-times" *ngIf="isMobile && !menuFechado" (click)="toggleMenuMobile()"></i>
+  </div>
+
+  <ul class="menu">
+    <div class="campoPesquisaMenu" *ngIf="pesquisaAtiva">
+      <form [formGroup]="formularioPesquisa" (submit)="navegarPagina(rotasFiltradas[0]?.rota)">
+        <div class="inputWrapper">
+          <input type="text" id="inputPesquisaMenu" formControlName="Pesquisa" placeholder="Buscar página..."
+            (keyup)="pesquisarPagina()" />
+          <button type="button" (click)="fecharPesquisa()">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </form>
+
+      <ul class="resultadosRotas">
+        <li *ngFor="let rota of rotasFiltradas" (click)="navegarPagina(rota.rota)">
+          {{ rota.titulo }}
+        </li>
+      </ul>
+    </div>
+
+    <ng-container *ngIf="!pesquisaAtiva">
+      <ng-container *ngFor="let ItemMenu of dadosMenu; let i = index">
+        <li *ngIf="temPermissao(ItemMenu.PerfilAcesso) && temAcessoDepartamento(ItemMenu)" class="menu-principal"
+          [ngClass]="{ 'ativo': ItemMenu.SubmenusAberto }">
+          <a *ngIf="ItemMenu.Submenus?.length" (click)="abrirFecharSubmenu(i)"
+            [ngClass]="{ 'ativo': ItemMenu.SubmenusAberto }">
+
+            <span class="iconeMenu">
+              <i class="fa fa-{{ItemMenu.Icone}}"></i>
+            </span>
+
+            <span class="titulo">{{ ItemMenu.Titulo }}</span>
+
+            <span class="setaDireita">
+              <i class="fa fa-chevron-{{ItemMenu.SubmenusAberto ? 'up' : 'down'}}"></i>
+            </span>
+          </a>
+
+          <a *ngIf="!ItemMenu.Submenus?.length" routerLink="/{{ItemMenu.Rota}}" (click)="fecharTodosMenus()">
+
+            <span class="iconeMenu">
+              <i class="fa fa-{{ItemMenu.Icone}}"></i>
+            </span>
+
+            <span class="titulo">{{ ItemMenu.Titulo }}</span>
+          </a>
+
+          <ul class="submenu" *ngIf="ItemMenu.Submenus && ItemMenu.SubmenusAberto">
+            <ng-container *ngFor="let Submenus of ItemMenu.Submenus; let c = index">
+              <li
+                *ngIf="ehTI || (Submenus.Rota !== 'Chamados/Infraestrutura' && Submenus.Rota !== 'Chamados/Desenvolvimento' && Submenus.Rota !== 'Chamados/Dados')"
+                [ngClass]="{ 'ativo': Submenus.MenuSubmenuAberto }">
+
+                <a *ngIf="Submenus.MenuSubmenu" (click)="abrirFecharMenuSubmenu(i, c)"
+                  [ngClass]="{ 'ativo': Submenus.MenuSubmenuAberto }">
+                  <span>{{ Submenus.Titulo }}</span>
+                  <span class="setaDireita">
+                    <i class="fa fa-chevron-{{Submenus.MenuSubmenuAberto ? 'up' : 'down'}}"></i>
+                  </span>
+                </a>
+
+                <a *ngIf="!Submenus.MenuSubmenu" routerLink="/{{Submenus.Rota}}" (click)="fecharTodosMenus()">
+                  {{ Submenus.Titulo }}
+                </a>
+
+                <ul class="menuSubmenu" *ngIf="Submenus.MenuSubmenu && Submenus.MenuSubmenuAberto">
+                  <li *ngFor="let MenuSubmenu of Submenus.MenuSubmenu">
+                    <a routerLink="/{{MenuSubmenu.Rota}}" (click)="fecharTodosMenus()">
+                      {{ MenuSubmenu.Titulo }}
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ng-container>
+          </ul>
+        </li>
+      </ng-container>
+      <li class="menu-principal" *ngIf="perfilAcessoUsuario == 'Usuário'">
+        <a routerLink="/Chamados/Novo">
+          <span class="iconeMenu">
+            <i class="fa fa-plus-circle"></i>
+          </span>
+
+          <span class="titulo">Abrir Chamado</span>
+        </a>
+      </li>
+    </ng-container>
+  </ul>
+
+  <div class="wrapperInferior">
+    <div class="menuPesquisa">
+      <a class="usuario-toggle" (click)="ativarPesquisa()">
+        <span class="iconeMenu">
+          <i class="fa fa-search"></i>
+        </span>
+        <span class="titulo" [hidden]="menuFechado">Pesquisar Página</span>
+      </a>
+    </div>
+
+    <div class="menuUsuario" [ngClass]="{ 'usuarioAtivo': usuarioMenuAberto }">
+      <a (click)="abrirFecharUsuarioMenu()" class="usuario-toggle">
+        <span class="iconeMenu">
+          <i class="fa fa-user"></i>
+        </span>
+        <span class="titulo">{{ nomeUsuario }}</span>
+        <span class="setaDireita">
+          <i class="fa fa-chevron-{{usuarioMenuAberto ? 'up' : 'down'}}"></i>
+        </span>
+      </a>
+
+      <ul class="submenu" *ngIf="usuarioMenuAberto">
+        <li>
+          <a (click)="overlayUsuarioAberto = true">
+            <span class="iconeMenu"><i class="fa fa-pencil"></i></span>
+            <span class="titulo">Editar meu usuário</span>
+          </a>
+        </li>
+
+        <li>
+          <a routerLink="/Login">
+            <span class="iconeMenu"><i class="fa fa-sign-out"></i></span>
+            <span class="titulo">Sair</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="overlay-usuario" *ngIf="overlayUsuarioAberto">
+  <div class="overlay-usuario__content">
+    <div class="overlay-usuario__header">
+      <h3>Editar meu usuário</h3>
+      <button type="button" class="btn-fechar" (click)="overlayUsuarioAberto=false">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="formularioUsuario" #formDir="ngForm">
+      <div class="overlay-usuario__body">
+
+        <div class="linha-campos">
+          <div class="campo">
+            <label for="nome"
+              [style.color]="formularioUsuario.get('Nome')?.invalid && formDir.submitted? 'red': '#000'">Nome</label>
+            <input id="nome" type="text" formControlName="Nome" />
+          </div>
+
+          <div class="campo">
+            <label for="email"
+              [style.color]="formularioUsuario.get('Email')?.invalid && formDir.submitted? 'red': '#000'">E-mail</label>
+            <input id="email" type="email" formControlName="Email" />
+          </div>
+        </div>
+
+        <div class="linha-campos">
+          <div class="campo">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" type="tel" formControlName="Telefone" (input)="mascararTelefone()" />
+          </div>
+
+          <div class="campo campo-senha">
+            <label for="Senha">Senha</label>
+            <input id="Senha" [type]="mostrarSenha ? 'text' : 'password'" formControlName="Senha" />
+            <button type="button" class="toggle-senha" (click)="alternarVisibilidadeSenha()"
+              [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'">
+              <i class="fa" [ngClass]="mostrarSenha ? 'fa-eye' : 'fa-eye-slash'"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="imagem-wrapper">
+          <div class="imagem">
+            <img [src]="imagemUsuario" alt="Foto do usuário" *ngIf="imagemUsuario">
+            <i class="fa fa-user" *ngIf="!imagemUsuario"></i>
+          </div>
+
+          <div class="input-file-custom">
+            <label for="inputImagem" class="btn-arquivo">
+              <i class="fa fa-upload"></i>
+              {{ imagemUsuario ? 'Substituir' : 'Selecionar' }} foto
+            </label>
+            <input type="file" id="inputImagem" (change)="converterImagemBase64($event)" hidden />
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay-usuario__footer">
+        <button type="button" class="btn-sec" (click)="overlayUsuarioAberto = false">Cancelar</button>
+        <button type="submit" class="btn-pri" (click)="editarUsuario()">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>

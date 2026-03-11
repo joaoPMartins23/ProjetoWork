@@ -1,0 +1,336 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;  /* crucial */
+}
+
+.cabecalho-tabela {
+  padding-bottom: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .lado-esquerdo {
+    .input-pesquisa {
+      width: 100%;
+      max-width: 520px;
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      input {
+        padding-right: 0; // espaço para o ícone
+        padding-left: 0.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        width: 100%;
+        min-width: 0; // <- importante
+        padding-right: 3.2rem;
+
+        &:focus {
+          outline: none;
+          border-color: #00a74a;
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+      }
+
+      i.fa-search {
+        width: 46px;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        right: 0;
+        color: #fff;
+        background-color: #333;
+        pointer-events: none;
+        font-size: 0.9rem;
+        border-radius: 0 8px 8px 0;
+      }
+    }
+  }
+
+  .btn-novo {
+    background-color: #00a74a;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 0.9rem;
+    }
+
+    &:hover {
+      background-color: #009845;
+    }
+  }
+}
+
+.tabela-wrapper {
+  height: 100%;
+  max-height: none;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #fff;
+  /* scroll suave */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  &::ng-deep .ngx-pagination {
+    font-size: 12px;
+  }
+
+  &::ng-deep .ngx-pagination .current {
+    background-color: #00a74a;
+  }
+
+  .paginacao {
+    display: flex;
+    justify-content: center;
+    padding-top: 1em;
+    border-top: 1px solid #e5e7eb;
+
+    .ngx-pagination {
+      display: flex;
+      list-style: none;
+      gap: 0.5rem;
+
+      li {
+        a,
+        span {
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          cursor: pointer;
+          color: #333;
+          text-decoration: none;
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: #e9ecef;
+          }
+        }
+
+        &.current span {
+          background-color: #28a745;
+          color: white;
+          border-color: #28a745;
+        }
+
+        &.disabled span {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+.tabela-generica {
+  width: 100%;
+  min-width: 600px;
+  flex: 1 1 auto;
+  min-height: 0;     /* crucial */
+  height: auto;
+  max-height: none;  /* remove o 70vh */
+  overflow: auto;
+
+  thead {
+    background-color: #333;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+
+    .th-sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    .th-sortable.ativo {
+      color: #00a74a;
+    }
+    .setas {
+      margin-left: 0.35rem;
+      opacity: 0.7;
+    }
+  }
+
+  th {
+    cursor: pointer;
+  }
+
+  tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    &:hover {
+      background-color: #f1f1f1;
+    }
+
+    &:nth-child(even) {
+      background-color: #f5fff4;
+
+      &:hover {
+        background-color: #f1f1f1;
+      }
+    }
+  }
+}
+
+.nenhumDado {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1rem;
+  color: #666;
+  background-color: #fefefe;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .cabecalho-tabela {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+
+    .lado-esquerdo {
+      max-width: 100%;
+    }
+
+    .lado-direito {
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-novo {
+      width: 100%;
+      justify-content: center;
+      padding: 0.75rem 1rem; // mais "tocável"
+      border-radius: 10px;
+      font-weight: 700;
+    }
+  }
+
+  .tabela-wrapper {
+    max-height: unset; // no mobile, evita área pequena com 2 scrolls
+    overflow: visible; // cards sem scroll interno
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .tabela-generica {
+    width: 100%;
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem; // espaço entre cards
+  }
+
+  .tabela-generica thead {
+    display: none; // some com o cabeçalho da tabela
+  }
+
+  .tabela-generica tbody tr {
+    display: block;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  }
+
+  .tabela-generica tbody tr:hover {
+    background: #fff; // não precisa mudar fundo no card
+  }
+
+  .tabela-generica tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95rem;
+  }
+
+  .tabela-generica tbody td:last-child {
+    border-bottom: none;
+  }
+
+  /* o rótulo vem do seu data-label */
+  .tabela-generica tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #555;
+    padding-right: 1rem;
+    max-width: 55%;
+  }
+
+  /* coluna "valor" */
+  .tabela-generica tbody td {
+    gap: 1rem;
+  }
+
+  /* ícone de ativo melhor visível */
+  .tabela-generica tbody td i.fa-check {
+    color: #00a74a;
+  }
+  .tabela-generica tbody td i.fa-times {
+    color: #b00020;
+  }
+
+  /* Paginação mais "mobile friendly" */
+  .tabela-wrapper .paginacao {
+    border-top: none;
+    padding-top: 0.25rem;
+  }
+
+  .tabela-wrapper::ng-deep .ngx-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .tabela-wrapper::ng-deep .ngx-pagination li a,
+  .tabela-wrapper::ng-deep .ngx-pagination li span {
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
+  }
+
+  .nenhumDado {
+    margin-top: 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px dashed #d6d6d6;
+  }
+}

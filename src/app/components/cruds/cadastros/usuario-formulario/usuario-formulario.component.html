@@ -1,0 +1,174 @@
+<section>
+  <form [formGroup]="formularioUsuario" (ngSubmit)="onSubmit()" class="formulario-usuario" #formDir="ngForm"
+    *ngIf="!confirmacaoAtiva">
+    <div>
+      <div class="cabecalhoFormulario">
+        <h2>
+          <i class="fa fa-arrow-left" routerLink="/Usuarios"></i>
+          {{ urlAtual.length == 2? 'Criar': 'Editar' }} Usuário
+        </h2>
+
+        <i class="fa fa-times" routerLink="/Usuarios"></i>
+      </div>
+
+      <div *ngIf="carregando" class="area-carregando">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="form-linha linha-unica" *ngIf="!carregando">
+        <label [style.color]="formularioUsuario.get('Nome')?.invalid && formDir.submitted? 'red': '#000'">Nome</label>
+        <input type="text" formControlName="Nome"
+          placeholder="{{formularioUsuario.get('Nome')?.invalid && formDir.submitted? 'Obrigatório': ''}}" />
+      </div>
+
+      <div class="form-linha" *ngIf="!carregando">
+        <div>
+          <label
+            [style.color]="formularioUsuario.get('Email')?.invalid && formDir.submitted? 'red': '#000'">Email</label>
+          <input type="email" formControlName="Email"
+            placeholder="{{formularioUsuario.get('Email')?.invalid && formDir.submitted? 'Obrigatório': ''}}" />
+        </div>
+        <div>
+          <label>Senha</label>
+          <div class="senha-wrapper">
+            <input [type]="mostrarSenha ? 'text' : 'password'" formControlName="Senha" />
+            <i class="fa" [ngClass]="mostrarSenha ? 'fa-eye' : 'fa-eye-slash'" (click)="alternarVisibilidadeSenha()"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-linha" *ngIf="!carregando">
+        <div>
+          <label
+            [style.color]="formularioUsuario.get('DepartamentoID')?.invalid && formDir.submitted? 'red': '#000'">Departamento</label>
+          <ng-select class="cutom" [items]="departamentos" bindLabel="Departamento" bindValue="DepartamentoID"
+            formControlName="DepartamentoID" placeholder="Selecione">
+          </ng-select>
+        </div>
+        <div>
+          <label>Telefone</label>
+          <input type="tel" formControlName="Telefone" (input)="mascararTelefone()" placeholder="" />
+        </div>
+      </div>
+
+      <div class="form-linha" *ngIf="!carregando">
+        <div>
+          <label
+            [style.color]="formularioUsuario.get('PerfilAcessoID')?.invalid && formDir.submitted? 'red': '#000'">Perfil
+            de Acesso</label>
+          <ng-select [items]="perfis" bindLabel="PerfilAcesso" bindValue="PerfilAcessoID"
+            formControlName="PerfilAcessoID" placeholder="Selecione">
+          </ng-select>
+        </div>
+
+        <div
+          *ngIf="formularioUsuario.get('PerfilAcessoID')?.value != '4FFDC6E9-95D4-4A55-B459-419165A40A00' && formularioUsuario.get('PerfilAcessoID')?.value != ''">
+          <label
+            [style.color]="formularioUsuario.get('DepartamentoResponsavelID')?.invalid && formDir.submitted? 'red': '#000'">Departamento
+            Responsável</label>
+          <ng-select class="cutom" [items]="departamentoResponsaveis" bindLabel="DepartamentoResponsavel"
+            bindValue="DepartamentoResponsavelID" formControlName="DepartamentoResponsavelID" placeholder="Selecione">
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="checkbox-wrapper" *ngIf="!carregando">
+        <label>
+          <input type="checkbox" formControlName="Ativo" />
+          Ativo
+        </label>
+      </div>
+
+      <div class="imagem-wrapper" *ngIf="!carregando">
+        <div class="avatar-card">
+          <div class="avatar">
+            <img [src]="imagemUsuario" alt="Foto do usuário" *ngIf="imagemUsuario" />
+            <i class="fa fa-user" *ngIf="!imagemUsuario"></i>
+
+            <button type="button" class="avatar-action" (click)="inputImagem.click()">
+              <i class="fa fa-camera"></i>
+            </button>
+          </div>
+
+          <div class="avatar-info">
+            <div class="avatar-title">
+              <strong>Foto do usuário</strong>
+              <span class="avatar-subtitle">
+                JPG/PNG • até 2MB
+              </span>
+            </div>
+
+            <div class="avatar-actions">
+              <button type="button" class="btn-secundario" (click)="inputImagem.click()">
+                <i class="fa fa-upload"></i>
+                {{ imagemUsuario ? 'Trocar foto' : 'Enviar foto' }}
+              </button>
+
+              <button type="button" class="btn-terciario" *ngIf="imagemUsuario" (click)="imagemUsuario = ''">
+                <i class="fa fa-trash"></i>
+                Remover
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <input #inputImagem type="file" id="inputImagem" accept="image/png, image/jpeg"
+          (change)="converterImagemBase64($event)" hidden />
+      </div>
+
+    </div>
+
+    <div class="botoesFormulario" *ngIf="!carregando">
+      <button type="button" class="btn-excluir" *ngIf="urlAtual.length == 3" (click)="alternarConfirmacao()">
+        <i class="fa fa-trash"></i>
+        Excluir
+      </button>
+
+      <button type="submit" class="btn-salvar">
+        <i class="fa fa-save"></i>
+        Salvar
+      </button>
+    </div>
+
+  </form>
+
+  <div class="confirmacaoExclusao" *ngIf="confirmacaoAtiva" (click)="alternarConfirmacao()">
+    <div class="modal-exclusao" (click)="$event.stopPropagation()">
+      <div class="cabecalhoExclusao">
+        <div class="titulo">
+          <div class="icone-alerta">
+            <i class="fa fa-exclamation-triangle"></i>
+          </div>
+          <div>
+            <h2>Excluir usuário</h2>
+            <p>Essa ação não pode ser desfeita.</p>
+          </div>
+        </div>
+
+        <button type="button" class="btn-fechar" (click)="alternarConfirmacao()">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+
+      <div class="corpoExclusao">
+        <p>
+          Tem certeza de que deseja excluir este usuário?
+          <span class="destaque" *ngIf="formularioUsuario.get('Nome')?.value">
+            {{ formularioUsuario.get('Nome')?.value }}
+          </span>
+        </p>
+      </div>
+
+      <div class="botoes-confirmacao">
+        <button type="button" class="btn-cancelar" (click)="alternarConfirmacao()">
+          Cancelar
+        </button>
+
+        <button type="button" class="btn-confirmar-exclusao" (click)="confirmarExclusao()">
+          <i class="fa fa-trash"></i>
+          Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
